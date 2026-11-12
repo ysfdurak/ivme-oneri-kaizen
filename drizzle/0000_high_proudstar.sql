@@ -1,0 +1,27 @@
+CREATE TABLE `sessions` (
+	`token` text PRIMARY KEY NOT NULL,
+	`user_id` text NOT NULL,
+	`expires` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `users` (
+	`id` text PRIMARY KEY NOT NULL,
+	`username` text NOT NULL,
+	`name` text NOT NULL,
+	`department` text NOT NULL,
+	`directorate` text NOT NULL,
+	`role` text NOT NULL,
+	`manager` text,
+	`password` text NOT NULL,
+	`must_change` integer DEFAULT 1 NOT NULL,
+	`active` integer DEFAULT 1 NOT NULL,
+	`failures` integer DEFAULT 0 NOT NULL,
+	`locked_until` integer DEFAULT 0 NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);--> statement-breakpoint
+CREATE TABLE `workspace` (
+	`id` text PRIMARY KEY NOT NULL,
+	`data` text NOT NULL,
+	`version` integer DEFAULT 1 NOT NULL
+);

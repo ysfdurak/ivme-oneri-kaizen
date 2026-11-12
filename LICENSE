@@ -1,0 +1,22 @@
+İvme · Öneri ve Kaizen Merkezi
+Copyright (c) 2026 Yusuf Durak. Tüm hakları saklıdır. / All rights reserved.
+
+TÜRKÇE
+Bu depodaki kaynak kod yalnızca incelenmek ve değerlendirilmek amacıyla herkese açık tutulmaktadır.
+Yazılı izin olmadan kodun tamamı ya da bir bölümü kopyalanamaz, değiştirilemez, dağıtılamaz,
+bir kurumda kurulamaz, hizmet olarak sunulamaz ve ticari amaçla kullanılamaz.
+Kişisel öğrenme amacıyla okunması ve kendi bilgisayarında denenmesi serbesttir.
+İzin ve iş birliği için: https://ysfdurak.com
+
+ENGLISH
+The source code in this repository is publicly visible for review and evaluation only.
+Without prior written permission you may not copy, modify, distribute, deploy within an
+organisation, offer as a service, or use for any commercial purpose all or any part of it.
+Reading it for personal learning and running it on your own computer is permitted.
+For permission or collaboration: https://ysfdurak.com
+
+Üçüncü taraf parçalar kendi lisanslarıyla gelir / Third-party parts keep their own licences:
+scripts/vite/sites-vite-plugin.ts (MIT, OpenAI), vendor/shadcn-tailwind-4.13.0.css (MIT, shadcn),
+ve package.json'daki bağımlılıklar / and the dependencies listed in package.json.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.

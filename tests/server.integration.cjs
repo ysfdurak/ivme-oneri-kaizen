@@ -1,0 +1,36 @@
+const assert=require('node:assert/strict');
+const {DatabaseSync}=require('node:sqlite');
+const fs=require('node:fs');const Module=require('node:module');
+const sqlite=new DatabaseSync(':memory:');sqlite.exec(fs.readFileSync('drizzle/0000_high_proudstar.sql','utf8'));
+const db={prepare(sql){return {params:[],bind(...params){this.params=params;return this},async first(){return sqlite.prepare(sql).get(...this.params)||null},async all(){return {results:sqlite.prepare(sql).all(...this.params)}},async run(){const r=sqlite.prepare(sql).run(...this.params);return {meta:{changes:Number(r.changes)}}}}},async batch(statements){sqlite.exec('BEGIN');try{const r=[];for(const s of statements)r.push(await s.run());sqlite.exec('COMMIT');return r}catch(e){sqlite.exec('ROLLBACK');throw e}}};
+const original=Module._load;Module._load=function(name,parent,...rest){if(name==='cloudflare:workers')return {env:{DB:db}};return original.call(this,name,parent,...rest)};
+const auth=require('/tmp/kaizen-server-tests/app/api/auth/route.js');const state=require('/tmp/kaizen-server-tests/app/api/state/route.js');const command=require('/tmp/kaizen-server-tests/app/api/command/route.js');
+let cookie='';const origin='https://kaizen.test';
+async function req(route,body){const request=new Request(origin+'/api/'+route,{method:body?'POST':'GET',headers:{...(body?{'Content-Type':'application/json','Origin':origin}:{}),...(cookie?{'Cookie':cookie}:{})},...(body?{body:JSON.stringify(body)}:{})});const handlers={auth,state,command};const r=await handlers[route][body?'POST':'GET'](request);const set=r.headers.get('set-cookie');if(set)cookie=set.split(';')[0];return [r,await r.json()];}
+(async()=>{
+let [r,b]=await req('auth');assert.equal(r.status,200);assert.equal(b.user,null);
+[r,b]=await req('state');assert.equal(r.status,401);
+[r,b]=await req('auth',{username:'admin',password:'Kaizen123!'});assert.equal(r.status,200);assert.equal(b.user.mustChange,1);
+[r,b]=await req('state');assert.equal(r.status,403);
+const nextPassword=crypto.randomUUID();
+[r,b]=await req('auth',{action:'password',oldPassword:'Kaizen123!',password:nextPassword});assert.equal(r.status,200);assert.equal(b.user.mustChange,0);
+[r,b]=await req('state');assert.equal(r.status,200);assert.equal(b.state.proposals.length,12);let version=b.version;
+[r,b]=await req('command',{action:'create',version,title:'Entegrasyon testi önerisi',problem:'Mal kabulde tekrarlanan kontrol nedeniyle zaman kaybı var.',solution:'Barkod doğrulama adımı ekle.',operation:'Mal Kabul'});assert.equal(r.status,200);const id=b.id;version++;
+[r,b]=await req('command',{action:'accept',id,version:version-1});assert.equal(r.status,409);
+[r,b]=await req('command',{action:'accept',id,version});assert.equal(r.status,200);version++;
+[r,b]=await req('state');assert.equal(b.state.proposals.find(p=>p.id===id).status,'Bölüm değerlendirmesi');
+[r,b]=await req('command',{action:'supportFlag',id,version,unit:'IT',selected:true});assert.equal(r.status,200);version++;
+[r,b]=await req('state');let support=b.state.proposals.find(p=>p.id===id).support;assert.equal(support[0].unit,'IT');assert.equal(support[0].status,'Bekliyor');assert.equal(support[0].owner,undefined);assert.equal(support[0].due,undefined);
+[r,b]=await req('command',{action:'supportFlag',id,version,unit:'IT',selected:false});assert.equal(r.status,200);version++;
+[r,b]=await req('state');support=b.state.proposals.find(p=>p.id===id).support;assert.equal(support[0].status,'Tamamlandı');assert.ok(b.state.proposals.find(p=>p.id===id).history.some(h=>h.text==='IT bekleme işareti kaldırıldı.'));
+await req('auth',{action:'logout'});[r,b]=await req('state');assert.equal(r.status,401);
+[r,b]=await req('auth',{username:'admin',password:nextPassword});assert.equal(r.status,200);assert.equal(b.user.mustChange,0);
+[r,b]=await req('state');assert.equal(b.state.proposals.find(p=>p.id===id).title,'Entegrasyon testi önerisi');
+const row=sqlite.prepare('SELECT password FROM users WHERE id=?').get('admin');assert.ok(!row.password.includes(nextPassword));
+await req('auth',{action:'logout'});[r,b]=await req('auth',{username:'calisan',password:'Kaizen123!'});assert.equal(r.status,200);
+await req('auth',{action:'password',oldPassword:'Kaizen123!',password:crypto.randomUUID()});
+[r,b]=await req('state');assert.equal(r.status,200);assert.ok(b.state.proposals.every(p=>p.author==='calisan'||p.owner==='calisan'||p.actions.some(a=>a.owner==='calisan')||p.support.some(a=>a.owner==='calisan')||p.evaluator==='calisan'||p.history.some(h=>h.actor==='calisan')));
+[r,b]=await req('command',{action:'cancel',id,reason:'Yetkisiz deneme',version:b.version});assert.equal(r.status,400);
+const foreign=new Request(origin+'/api/auth',{method:'POST',headers:{Origin:'https://foreign.test','Content-Type':'application/json'},body:JSON.stringify({username:'admin',password:'x'})});assert.equal((await auth.POST(foreign)).status,403);
+console.log('Server integration passed: real SQLite persistence, login, forced password change, hashed passwords, cookie sessions, stale version rejection, logout, role access and cross-origin rejection.');
+})().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>sqlite.close());

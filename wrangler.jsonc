@@ -1,0 +1,24 @@
+// İvme · Cloudflare Workers yayın ayarları (ivme.ysfdurak.com canlı demosu).
+// Şirket kurulumunda: IVME_VITRIN "0" yapılır (ya da satır silinir), "name" ve veritabanı adı değiştirilir,
+// e-posta için EMAIL_PROVIDER ve ilgili gizli anahtarlar Cloudflare panelinden eklenir (docs/MCP_REHBERI.md, README).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ivme",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-05-15",
+  "compatibility_flags": ["nodejs_compat"],
+  // Kimliksiz D1 bağlaması: ilk "wrangler deploy" veritabanını kendisi oluşturur (otomatik kaynak oluşturma).
+  // Tablolar uygulamanın ilk açılışında kurulur (lib/server.ts → ensureBaseSchema).
+  "d1_databases": [{ "binding": "DB", "database_name": "ivme-db" }],
+  "vars": {
+    // 1 = herkese açık vitrin demosu: rolle şifresiz giriş, örnek veri, her gece sıfırlama.
+    "IVME_VITRIN": "1",
+    // ai = MCP katmanlı sürüm (yapay zekâ bağlantısı Tanımlar'dan açılır, varsayılan kapalı); surec = yalnız süreç.
+    "IVME_EDITION": "ai",
+    // log = e-posta gönderilmez.
+    "EMAIL_PROVIDER": "log"
+  },
+  // Her gece 00:00 UTC (03:00 TR): vitrin verisini sıfırla (worker/index.ts → scheduled).
+  "triggers": { "crons": ["0 0 * * *"] },
+  "observability": { "enabled": true }
+}
