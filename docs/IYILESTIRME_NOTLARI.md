@@ -452,3 +452,9 @@ Tanımlar → **Eski önerileri aktar** (yalnız sistem yöneticisi). Ayrıntıl
 - **Yayın ayarı:** kök dizindeki `wrangler.jsonc` dosyası. İçinde Worker adı `ivme`, kimliksiz D1 bağlaması (ilk yayında otomatik oluşur), değişkenler ve cron var. `vite.config.ts` içindeki yer tutucu bağlamalar artık yalnız yerel geliştirmede kullanılıyor.
 - **Belgeler:** belgeler `docs/` klasörüne taşındı, README baştan yazıldı. Lisans "tüm hakları saklıdır": kod incelenebilir ama izinsiz kurulamaz ve ticari amaçla kullanılamaz.
 - **Testler:** `tests/vitrin.test.ts` eklendi (tarih kaydırma, veri boyutu, roller). 19 grup geçti. Temiz bir kopyada `pnpm install` → `npm run build` → `wrangler deploy --dry-run` sorunsuz çalıştı (gzip ile 381 KB).
+
+# İnceleme: içerik ve öğreticilik (15 Kasım 2026)
+- **Canlı demo rehberi (`app/demo-guide.tsx`):** vitrin modunda ana sayfada, seçilen role göre "burada neyi deneyebilirsin" kartı (2–3 madde, ilgili sayfaya bağlantı). Kapatılınca bu tarayıcıda rol başına gizli kalır. Gerçek kurulumda (vitrin dışı) görünmez.
+- **Lokasyon alanı:** "Liste Tanımlar sayfasından yönetilir" notu yalnız yöneticiye gösterilir; diğer kullanıcılar "Sorunun yaşandığı yer" görür.
+- **"Hangi birimi bekliyoruz?" kartı:** sayı iki kez yazılmıyor; bekleyen yoksa "Bekleyen öneri yok", varsa "N öneri bu birimin desteğini bekliyor".
+- Kontrol: 19 test grubu geçti; 6 rol masaüstü ve telefonda axe 0 ihlal.

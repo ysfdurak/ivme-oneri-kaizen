@@ -8571,3 +8571,62 @@ b.overdue {
   grid-column: 2;
   color: #6b5880;
 }
+
+/* Canlı demo rehberi (vitrin modunda ana sayfa) */
+.demo-guide {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px 48px 18px 20px;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #d9d2fa;
+}
+.demo-guide .metric-icon.pale-purple {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  background: var(--mint);
+  color: var(--green-dark);
+}
+.demo-guide h2 {
+  font-size: 17px;
+  margin: 4px 0 8px;
+}
+.demo-guide ol {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+.demo-guide li span {
+  margin-right: 8px;
+}
+.demo-guide-link {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--green-dark);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.demo-guide small {
+  color: var(--muted);
+}
+.demo-guide-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+}
+.demo-guide-close:hover {
+  background: var(--bg);
+}
