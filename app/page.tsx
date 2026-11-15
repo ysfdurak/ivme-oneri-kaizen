@@ -90,6 +90,7 @@ import {
 } from "../lib/definitions";
 import RewardsPage from "./rewards-page";
 import ReportBuilder from "./report-builder";
+import { DemoGuide } from "./demo-guide";
 import { pickRule, rewardText } from "../lib/rewards";
 import { REPORTS } from "../lib/dashboard";
 const NAV = [
@@ -1448,6 +1449,9 @@ export default function App() {
                     <Plus size={20} /> Öneri ver
                   </button>
                 </div>
+                {showcase && (
+                  <DemoGuide role={user.role} onNavigate={navigate} />
+                )}
                 {admin && strandedUsers.length > 0 && (
                   <button
                     className="draft-resume stranded-alert"
@@ -1805,7 +1809,10 @@ export default function App() {
                               <div>
                                 <b>{unit}</b>
                                 <small>
-                                  {count} önerinin ilerlemesi bekliyor
+                                  {count
+                                    ? count +
+                                      " öneri bu birimin desteğini bekliyor"
+                                    : "Bekleyen öneri yok"}
                                 </small>
                               </div>
                               <strong>{count}</strong>
@@ -2552,7 +2559,11 @@ export default function App() {
                           {(state.settings?.locations || []).length > 0 && (
                             <Field
                               label="Lokasyon"
-                              hint="İsteğe bağlı. Liste Tanımlar sayfasından yönetilir."
+                              hint={
+                                admin
+                                  ? "İsteğe bağlı. Liste Tanımlar sayfasından yönetilir."
+                                  : "İsteğe bağlı. Sorunun yaşandığı yer."
+                              }
                             >
                               <select
                                 value={form.location}
