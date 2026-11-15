@@ -1,3 +1,4 @@
+import { intlLocale } from "./i18n";
 export const STAGES = [
   "Ön değerlendirme",
   "Bölüm değerlendirmesi",
@@ -174,10 +175,10 @@ export type ImportBatch = {
   undone?: { at: string; by: string; removed: number };
 };
 export const fmt = (v: number) =>
-  new Intl.NumberFormat("tr-TR", { maximumFractionDigits: 0 }).format(v || 0);
+  new Intl.NumberFormat(intlLocale(), { maximumFractionDigits: 0 }).format(v || 0);
 export const money = (v: number) => "₺" + fmt(v);
 export const date = (v: string) =>
-  v ? new Date(v).toLocaleDateString("tr-TR") : "—";
+  v ? new Date(v).toLocaleDateString(intlLocale()) : "—";
 export const waiting = (p: Proposal) =>
   CLOSED.includes(p.status)
     ? []

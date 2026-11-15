@@ -1,6 +1,7 @@
 // E-posta bildirim kuralları (saf fonksiyonlar; veritabanı ve gönderimden bağımsız, test edilebilir).
 // Süreç (workflow) her değişiklikte bir "olay" üretir; bu dosya olayları kurallara göre alıcılara ve
 // e-posta içeriklerine çevirir. Gönderim lib/outbox.ts ve lib/mailer.ts içindedir.
+import { translate as tr } from "./i18n";
 import {
   CLOSED,
   Proposal,
@@ -122,9 +123,13 @@ export function renderEmail(
   lines: string[],
   link?: { url: string; label: string },
 ) {
+  // E-postanın dili kurulumun dilidir (IVME_LANG → worker/index.ts). Türkçede tr() metni olduğu gibi bırakır.
+  title = tr(title);
+  lines = lines.map((l) => tr(l));
+  if (link) link = { ...link, label: tr(link.label) };
   const html =
     `<div style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;color:#1f1d3a">` +
-    `<p style="font-size:13px;color:#65557a;margin:0 0 8px">İvme · Öneri ve Kaizen Merkezi</p>` +
+    `<p style="font-size:13px;color:#65557a;margin:0 0 8px">${esc(tr("İvme · Öneri ve Kaizen Merkezi"))}</p>` +
     `<h2 style="font-size:18px;margin:0 0 12px">${esc(title)}</h2>` +
     lines
       .map(
@@ -135,7 +140,7 @@ export function renderEmail(
     (link
       ? `<p style="margin:16px 0"><a href="${esc(link.url)}" style="background:#5b45d6;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-size:14px">${esc(link.label)}</a></p>`
       : "") +
-    `<p style="font-size:12px;color:#65557a;margin-top:20px">Bildirim tercihini uygulamada adının yanındaki menüden değiştirebilirsin.</p></div>`;
+    `<p style="font-size:12px;color:#65557a;margin-top:20px">${esc(tr("Bildirim tercihini uygulamada adının yanındaki menüden değiştirebilirsin."))}</p></div>`;
   const text = [
     title,
     "",
@@ -187,7 +192,7 @@ export function buildMessages(
     out.push({
       userId: u.id,
       email: u.email,
-      subject: "[İvme] " + p.id + " · " + title,
+      subject: "[İvme] " + p.id + " · " + tr(title),
       html,
       text,
       eventKey: ev.type,
@@ -362,11 +367,19 @@ export function renderTableEmail(
   sections: { title: string; head: string[]; rows: string[][] }[],
   link: { url: string; label: string },
 ) {
+  title = tr(title);
+  intro = tr(intro);
+  sections = sections.map((sec) => ({
+    title: tr(sec.title),
+    head: sec.head.map((h) => tr(h)),
+    rows: sec.rows.map((r) => r.map((c) => tr(c))),
+  }));
+  link = { ...link, label: tr(link.label) };
   const cell =
     "padding:6px 8px;border-bottom:1px solid #e9eaf1;font-size:13px;text-align:left;vertical-align:top";
   const html =
     `<div style="font-family:Segoe UI,Arial,sans-serif;max-width:720px;color:#1f1d3a">` +
-    `<p style="font-size:13px;color:#65557a;margin:0 0 8px">İvme · Öneri ve Kaizen Merkezi</p>` +
+    `<p style="font-size:13px;color:#65557a;margin:0 0 8px">${esc(tr("İvme · Öneri ve Kaizen Merkezi"))}</p>` +
     `<h2 style="font-size:18px;margin:0 0 8px">${esc(title)}</h2>` +
     `<p style="font-size:14px;margin:0 0 12px">${esc(intro)}</p>` +
     sections
@@ -398,7 +411,7 @@ export function renderTableEmail(
       )
       .join("") +
     `<p style="margin:18px 0"><a href="${esc(link.url)}" style="background:#5b45d6;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-size:14px">${esc(link.label)}</a></p>` +
-    `<p style="font-size:12px;color:#65557a;margin-top:20px">Bu e-posta günde bir kez gelir. Bildirim tercihini uygulamada adının yanındaki menüden değiştirebilirsin.</p></div>`;
+    `<p style="font-size:12px;color:#65557a;margin-top:20px">${esc(tr("Bu e-posta günde bir kez gelir. Bildirim tercihini uygulamada adının yanındaki menüden değiştirebilirsin."))}</p></div>`;
   const text = [
     title,
     intro,
@@ -546,7 +559,7 @@ export function buildReminders(
       b.team.length && b.team.length + " ekip gecikmesi",
       b.actions.length && b.actions.length + " aksiyon",
     ].filter(Boolean);
-    const subject = "Günlük gecikme özeti · " + parts.join(", ");
+    const subject = tr("Günlük gecikme özeti") + " · " + parts.map((x) => tr(String(x))).join(", ");
     const { html, text } = renderTableEmail(
       subject,
       "Merhaba " + u.name + ", bugün ilgilenmen gerekenler:",
@@ -584,14 +597,14 @@ export function combine(
       continue;
     }
     const { html, text } = renderEmail(
-      subject + " (" + list.length + ")",
+      tr(subject) + " (" + list.length + ")",
       list.map((m) => "• " + m.subject.replace(/^\[İvme\] /, "")),
       { url: appUrl + "/", label: "İvme'yi aç" },
     );
     out.push({
       userId,
       email: list[0].email,
-      subject: "[İvme] " + subject + " (" + list.length + ")",
+      subject: "[İvme] " + tr(subject) + " (" + list.length + ")",
       html,
       text,
       eventKey: "digest",

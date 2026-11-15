@@ -1,4 +1,5 @@
 "use client";
+import { intlLocale, pct, translate } from "../lib/i18n";
 // Durum panosu: açık önerilerin kimde, hangi birimde ve ne kadar süredir beklediğini gösterir.
 // Her rapor grafik veya tablo olarak görülebilir, CSV olarak indirilebilir.
 // Hesaplamalar lib/dashboard.ts içindedir; bu dosya yalnızca gösterimden sorumludur.
@@ -66,7 +67,7 @@ function csv(name: string, rows: (string | number)[][]) {
           .map(
             (x) =>
               '"' +
-              String(x ?? "")
+              translate(String(x ?? ""))
                 .replace(/"/g, '""')
                 .replace(/^[=+@-]/, "'") +
               '"',
@@ -288,7 +289,7 @@ function GroupTable({
   );
 }
 const fmtDays = (n: number) =>
-  n.toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " gün";
+  n.toLocaleString(intlLocale(), { maximumFractionDigits: 1 }) + " gün";
 const groupCsv = (first: string, rows: GroupRow[]) => [
   [
     first,
@@ -880,7 +881,7 @@ export default function DashboardPage(props: Props) {
                     <li key={b.key} className={"pb-" + b.key}>
                       <b>{b.count}</b>
                       <span>{b.label}</span>
-                      <small>%{b.share}</small>
+                      <small>{pct(b.share)}</small>
                     </li>
                   ))}
                 </ul>

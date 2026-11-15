@@ -1,4 +1,5 @@
 "use client";
+import { t, translate } from "../lib/i18n";
 // Tanımlar: öneri sınıfları (alt sınıflarıyla), ret ve uygulanamama nedenleri, kazanç türleri,
 // puanlama kriterleri ve aşama hedef süreleri. Kurallar lib/definitions.ts içinde; burası yalnız düzenleme ekranı.
 import React, { useEffect, useMemo, useState } from "react";
@@ -64,8 +65,8 @@ function ItemRows({
             className={it.active ? "" : "inactive"}
           >
             <input
-              aria-label={label + " " + (i + 1) + " adı"}
-              value={it.name}
+              aria-label={t("{0} · {1}. madde adı", label, i + 1)}
+              value={it.locked ? translate(it.name) : it.name}
               maxLength={60}
               disabled={it.locked}
               onChange={(e) => set(i, { name: e.target.value })}

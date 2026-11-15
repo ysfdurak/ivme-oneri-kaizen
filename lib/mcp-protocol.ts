@@ -1,6 +1,18 @@
 // MCP protokolü (JSON-RPC 2.0, "Streamable HTTP" taşıması, yalnız istek/yanıt).
 // Saf: çağıran rota kimliği doğrular ve araçları çalıştıran fonksiyonu verir; bu dosya yalnız mesajı yorumlar.
 // Desteklenen yöntemler: initialize, notifications/*, ping, tools/list, tools/call.
+import { getLocale, translate as tr } from "./i18n";
+/** Kurulum İngilizceyse araç açıklamaları ve sonuçlardaki sabit metinler (aşama adları gibi) çevrilir; alan adları değişmez. */
+const trDeep = (v: any): any =>
+  getLocale() === "tr"
+    ? v
+    : typeof v === "string"
+      ? tr(v)
+      : Array.isArray(v)
+        ? v.map(trDeep)
+        : v && typeof v === "object"
+          ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, trDeep(x)]))
+          : v;
 import { MCP_TOOLS, ToolError } from "./mcp-tools";
 
 export const SUPPORTED_VERSIONS = ["2025-06-18", "2025-03-26", "2024-11-05"];
@@ -46,8 +58,9 @@ export async function handleRpc(msg: Rpc, run: Runner) {
           : SUPPORTED_VERSIONS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: SERVER_INFO,
-        instructions:
+        instructions: tr(
           "İvme öneri sistemine salt okuma erişimi. Kullanıcı yalnızca web'de görebildiği kayıtları görür. Kabul, ret, devir gibi kararlar web arayüzünde verilir; burada önerme, özetleme ve bulma yapılır.",
+        ),
       });
     }
     case "ping":
@@ -56,15 +69,18 @@ export async function handleRpc(msg: Rpc, run: Runner) {
       return result(id, {
         tools: MCP_TOOLS.map((t) => ({
           ...t,
+          title: tr(t.title),
+          description: tr(t.description),
+          inputSchema: trDeep(t.inputSchema),
           annotations: { readOnlyHint: true, openWorldHint: false },
         })),
       });
     case "tools/call": {
       const name = msg.params?.name;
       if (!MCP_TOOLS.some((t) => t.name === name))
-        return error(id, -32602, "Bilinmeyen araç: " + name);
+        return error(id, -32602, tr("Bilinmeyen araç: " + name));
       try {
-        const value = await run(name, msg.params?.arguments || {});
+        const value = trDeep(await run(name, msg.params?.arguments || {}));
         return result(id, {
           content: [{ type: "text", text: JSON.stringify(value, null, 1) }],
           structuredContent: value,
@@ -73,14 +89,14 @@ export async function handleRpc(msg: Rpc, run: Runner) {
         // Araç hatası (ör. yetki yok) modele okunur bir sonuç olarak döner; sunucu hatası değildir.
         if (e instanceof ToolError)
           return result(id, {
-            content: [{ type: "text", text: e.message }],
+            content: [{ type: "text", text: tr(e.message) }],
             isError: true,
           });
         console.error("MCP araç hatası", e);
-        return error(id, -32603, "Araç çalıştırılamadı.");
+        return error(id, -32603, tr("Araç çalıştırılamadı."));
       }
     }
     default:
-      return error(id, -32601, "Desteklenmeyen yöntem: " + msg.method);
+      return error(id, -32601, tr("Desteklenmeyen yöntem: " + msg.method));
   }
 }

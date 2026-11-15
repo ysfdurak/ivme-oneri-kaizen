@@ -1,4 +1,5 @@
 "use client";
+import { pct } from "../lib/i18n";
 // Tanınma: tamamlanan iyileştirmeleri görünür kılar, departman katılımını gösterir, kişiye kendi rozetlerini verir.
 // Kişiler arası sıralama bilerek yoktur; amaç yarış değil, katkıyı görünür kılmak.
 import React, { useEffect, useState } from "react";
@@ -83,7 +84,7 @@ export default function RecognitionPage({
           [t.submitted, "öneri verildi"],
           [t.completed, "iyileştirme tamamlandı"],
           [t.participants, "kişi katkı verdi"],
-          ["%" + t.participation, "katılım oranı"],
+          [pct(t.participation), "katılım oranı"],
         ].map(([v, l]) => (
           <div key={String(l)} role="listitem" className="rec-total">
             <b>{v}</b>

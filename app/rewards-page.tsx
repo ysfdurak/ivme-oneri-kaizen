@@ -1,4 +1,5 @@
 "use client";
+import { intlLocale, translate } from "../lib/i18n";
 // Ödüller (ödül sorumlusu / İK ve sistem yöneticisi): puanlamadan sonra otomatik oluşan ödül kayıtları.
 // Onayla (değeri gerekçeyle değiştirerek), reddet ya da onaylananı bordro dönemiyle "ödendi" işaretle.
 // Maaş bilgisi tutulmaz: "0,5 brüt maaş" talimattır, tutarı İK kendi sisteminde hesaplar.
@@ -18,7 +19,7 @@ type Props = {
 };
 
 const money = (n: number) =>
-  n.toLocaleString("tr-TR", { maximumFractionDigits: 0 }) + " ₺";
+  n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 }) + " ₺";
 const thisMonth = () =>
   new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 7);
 
@@ -31,7 +32,7 @@ function download(name: string, rows: (string | number)[][]) {
           .map(
             (x) =>
               '"' +
-              String(x ?? "")
+              translate(String(x ?? ""))
                 .replace(/"/g, '""')
                 .replace(/^[=+@-]/, "'") +
               '"',

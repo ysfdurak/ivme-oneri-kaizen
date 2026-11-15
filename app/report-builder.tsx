@@ -1,4 +1,5 @@
 "use client";
+import { intlLocale, translate } from "../lib/i18n";
 // Rapor oluştur: filtre, gruplama ve ölçüleri kullanıcı seçer; hazır raporlarla başlar, kendi raporunu kaydeder.
 // Hesaplar lib/report-builder.ts içindedir. Kayıtlı raporlar bu tarayıcıda kişiye özel saklanır.
 import React, { useEffect, useMemo, useState } from "react";
@@ -38,8 +39,8 @@ type Props = {
 
 const fmt = (n: number, money?: boolean) =>
   money
-    ? n.toLocaleString("tr-TR", { maximumFractionDigits: 0 }) + " ₺"
-    : n.toLocaleString("tr-TR", { maximumFractionDigits: 1 });
+    ? n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 }) + " ₺"
+    : n.toLocaleString(intlLocale(), { maximumFractionDigits: 1 });
 
 function csv(name: string, rows: (string | number)[][]) {
   const text =
@@ -50,7 +51,7 @@ function csv(name: string, rows: (string | number)[][]) {
           .map(
             (x) =>
               '"' +
-              String(x ?? "")
+              translate(String(x ?? ""))
                 .replace(/"/g, '""')
                 .replace(/^[=+@-]/, "'") +
               '"',
@@ -487,7 +488,7 @@ export default function ReportBuilder({
                           .filter((x) => x.id !== primary.id)
                           .map(
                             (x) =>
-                              x.label.replace(/ ₺$/, "") +
+                              translate(x.label.replace(/ ₺$/, "")) +
                               " " +
                               fmt(r.values[x.id], x.money),
                           )

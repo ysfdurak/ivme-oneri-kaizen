@@ -2,7 +2,7 @@
 
 Çalışanın sahadan verdiği iyileştirme önerisini; değerlendirme, aksiyon, kazanç, puan ve ödüle kadar tek akışta yöneten web uygulaması. Telefondan öneri verilir, masaüstünden yönetilir.
 
-**Canlı demo:** [ivme.ysfdurak.com](https://ivme.ysfdurak.com). Bir rol seçerek şifresiz girilir. Örnek bir şirketin 120 önerisi yüklüdür. Veriler her gece sıfırlanır, e-posta gönderilmez.
+**Canlı demo:** [ivme.ysfdurak.com](https://ivme.ysfdurak.com) (Türkçe) · [ivme-en.ysfdurak.com](https://ivme-en.ysfdurak.com) (English). Bir rol seçerek şifresiz girilir. Örnek bir şirketin 120 önerisi yüklüdür. Veriler her gece sıfırlanır, e-posta gönderilmez.
 
 ![Giriş: rol seçerek canlı demo](docs/ekranlar/01-giris.png)
 
@@ -29,6 +29,7 @@ Kâğıt formlarda ya da e-posta zincirlerinde yürüyen öneri sistemlerinde ö
 - **Kuruma uyarlama:** öneri sınıfları, ret ve uygulanamama nedenleri, kazanç türleri, puan kriterleri, hedef süreler ve bildirim kuralları Tanımlar ekranından yönetilir.
 - **Geçiş:** kullanıcılar ve eski öneriler Excel ile aktarılır. Aktarım önce kontrol edilir; sonradan geri alınabilir.
 - **Erişilebilirlik:** klavye ile kullanım ve ekran okuyucu etiketleri. Ekranlar axe ile taranmıştır.
+- **Türkçe / English:** arayüz, e-postalar, raporlar ve dışa aktarımlar iki dilde. Kişi dilini TR/EN düğmesiyle seçer; kurulumun varsayılanı `IVME_LANG`. Ayrıntı: [docs/DIL_DESTEGI.md](docs/DIL_DESTEGI.md).
 
 ## İki sürüm, ortak çekirdek
 
@@ -66,14 +67,14 @@ pnpm install
 npm run build
 npm start                                   # http://localhost:8787
 npm start -- --var IVME_VITRIN:0            # vitrin yerine normal giriş ekranı
-./scripts/test.sh                           # 19 test grubu
+./scripts/test.sh                           # 20 test grubu
 ```
 
 Büyük test verisi üretmek için `scripts/test-verisi/README.md` dosyasına bakın.
 
 ## Yayın
 
-`wrangler.jsonc` Cloudflare Workers ayarlarını içerir. Depo Cloudflare Workers Builds'e bağlıdır; `main` dalına her gönderimde derlenir ve yayınlanır. D1 veritabanı ilk yayında otomatik oluşturulur, tablolar uygulamanın ilk açılışında kurulur.
+`wrangler.jsonc` Cloudflare Workers ayarlarını içerir. Depo Cloudflare Workers Builds'e bağlıdır; `main` dalına her gönderimde derlenir ve yayınlanır. İngilizce demo aynı depodan ayrı bir Worker (`ivme-en`) olarak derlenir: `CLOUDFLARE_ENV=en npm run build` (kurulum adımları: [docs/DIL_DESTEGI.md](docs/DIL_DESTEGI.md)). D1 veritabanı ilk yayında otomatik oluşturulur, tablolar uygulamanın ilk açılışında kurulur.
 
 **Şirket kurulumu için:**
 - `IVME_VITRIN` `0` yapılır.
@@ -84,14 +85,15 @@ Bu sürüm bütün çalışma alanını tek bir kayıtta tuttuğu için D1'in 2 
 
 ## Belgeler
 
-- [docs/IYILESTIRME_NOTLARI.md](docs/IYILESTIRME_NOTLARI.md): her özelliğin neden ve nasıl eklendiği (12 tur)
+- [docs/IYILESTIRME_NOTLARI.md](docs/IYILESTIRME_NOTLARI.md): her özelliğin neden ve nasıl eklendiği (13 tur)
 - [docs/AKTARIM_REHBERI.md](docs/AKTARIM_REHBERI.md): eski önerilerin Excel ile aktarılması ve geri alınması
 - [docs/MCP_REHBERI.md](docs/MCP_REHBERI.md): yapay zekâ katmanı, kurulum ve güvenlik
+- [docs/DIL_DESTEGI.md](docs/DIL_DESTEGI.md): Türkçe / English arayüz, yeni metin ekleme, İngilizce demo
 - [docs/KABUL_VE_KARAR_NOTLARI.md](docs/KABUL_VE_KARAR_NOTLARI.md): ilk pilotun kararları
 
 ## English
 
-İvme is an employee suggestion and kaizen management system. One workflow covers each idea from submission through review, action, savings, scoring and reward, with role-based work queues, stage targets and overdue alerts, a report builder, participation statistics, e-mail notifications, Excel migration and an optional read-only MCP layer for in-house AI. The interface is in Turkish. Live demo: [ivme.ysfdurak.com](https://ivme.ysfdurak.com). Pick a role to sign in; sample data resets nightly.
+İvme is an employee suggestion and kaizen management system. One workflow covers each idea from submission through review, action, savings, scoring and reward, with role-based work queues, stage targets and overdue alerts, a report builder, participation statistics, e-mail notifications, Excel migration and an optional read-only MCP layer for in-house AI. The interface, e-mails, reports and exports are available in Turkish and English (TR/EN switch; installation default via `IVME_LANG`). English live demo with English sample data: [ivme-en.ysfdurak.com](https://ivme-en.ysfdurak.com). Pick a role to sign in; sample data resets nightly.
 
 ## Lisans
 

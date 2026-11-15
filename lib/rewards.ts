@@ -6,6 +6,7 @@
 //
 // Maaş bilgisi İvme'de TUTULMAZ: "0,5 brüt maaş" bir talimattır, tutarı İK kendi sisteminde hesaplar.
 // Kurallar yukarıdan aşağı denenir; puanı ve (varsa) yıllık net kazanç şartını karşılayan ilk kural uygulanır.
+import { intlLocale } from "./i18n";
 import { Proposal, gainFigures } from "./model";
 
 export type RewardKind = "salary" | "amount" | "gift";
@@ -97,7 +98,7 @@ export const DEFAULT_REWARD_SETTINGS: RewardSettings = {
 };
 
 const tr = (n: number, digits = 2) =>
-  n.toLocaleString("tr-TR", { maximumFractionDigits: digits });
+  n.toLocaleString(intlLocale(), { maximumFractionDigits: digits });
 /** Değeri okunur metne çevirir: "0,5 brüt maaş", "5.000 ₺", "Teşekkür belgesi". */
 export function rewardText(kind: RewardKind, value: number, label = "") {
   if (kind === "salary") return tr(value) + " brüt maaş";

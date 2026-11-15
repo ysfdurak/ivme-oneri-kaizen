@@ -8630,3 +8630,55 @@ b.overdue {
 .demo-guide-close:hover {
   background: var(--bg);
 }
+
+/* Dil seçimi (TR / EN) · app/language-switch.tsx */
+.lang-switch {
+  display: inline-flex;
+  border: 1px solid var(--border, #d9dbe7);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+.lang-switch button {
+  border: 0;
+  background: transparent;
+  color: #4f6185;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 5px 10px;
+  min-height: 30px;
+  cursor: pointer;
+}
+.lang-switch button + button {
+  border-left: 1px solid var(--border, #d9dbe7);
+}
+.lang-switch button.active {
+  background: #5b45d6;
+  color: #fff;
+}
+.lang-switch button:focus-visible {
+  outline: 2px solid #5b45d6;
+  outline-offset: -2px;
+}
+.login-wrap {
+  position: relative;
+}
+.login-lang {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+}
+.side-lang {
+  margin: 0 0 14px;
+  align-self: flex-start;
+}
+.login-foot.alt-demo {
+  margin-top: 6px;
+}
+.login-foot.alt-demo a {
+  color: inherit;
+  font-weight: 600;
+}
