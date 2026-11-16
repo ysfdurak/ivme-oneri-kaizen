@@ -1,4 +1,5 @@
 "use client";
+import { getLocale, untranslate } from "../lib/i18n";
 // Toplu kullanıcı yükleme: Excel (.xlsx), CSV ya da Excel'den kopyala-yapıştır.
 // Akış: dosyayı oku → sütunları eşleştir → sunucuda deneme (dryRun) → onayla → yeni kişilerin geçici şifrelerini indir.
 import React, { useState } from "react";
@@ -20,7 +21,7 @@ const HEADERS: Record<keyof Row, string[]> = {
   email: ["e-posta", "eposta", "e-mail", "email", "mail"],
   department: ["departman", "bölüm", "birim", "department"],
   role: ["rol", "role", "yetki"],
-  manager: ["yönetici kullanıcı adı", "yönetici", "yonetici", "manager"],
+  manager: ["yönetici kullanıcı adı", "yönetici", "yonetici", "manager", "manager username"],
 };
 const norm = (s: any) =>
   String(s ?? "")
@@ -50,7 +51,8 @@ function toRows(table: any[][]): { rows: Row[]; missing: string[] } {
         username: get("username"),
         email: get("email"),
         department: get("department"),
-        role: get("role") || "Çalışan",
+        // Rol İngilizce yazılmışsa ("Employee") Türkçe adına döner; sunucu rolü Türkçe adından tanır.
+        role: untranslate(get("role")) || "Çalışan",
         manager: get("manager"),
       };
     });
@@ -180,11 +182,17 @@ export default function UserImport({
   }
 
   const template = () =>
-    download(
-      "ivme-kullanici-sablonu.csv",
-      "Ad soyad;Kullanıcı adı;E-posta;Departman;Rol;Yönetici kullanıcı adı\n" +
-        "Ayşe Yılmaz;ayse.yilmaz;ayse.yilmaz@ornek.com;Üretim;Çalışan;mehmet.kaya\n",
-    );
+    getLocale() === "en"
+      ? download(
+          "ivme-user-template.csv",
+          "Full name;Username;E-mail;Department;Role;Manager username\n" +
+            "Jane Smith;jane.smith;jane.smith@example.com;Production;Employee;mark.taylor\n",
+        )
+      : download(
+          "ivme-kullanici-sablonu.csv",
+          "Ad soyad;Kullanıcı adı;E-posta;Departman;Rol;Yönetici kullanıcı adı\n" +
+            "Ayşe Yılmaz;ayse.yilmaz;ayse.yilmaz@ornek.com;Üretim;Çalışan;mehmet.kaya\n",
+        );
 
   return (
     <section className="panel import-panel" aria-labelledby="import-title">

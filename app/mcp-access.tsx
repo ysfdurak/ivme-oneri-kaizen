@@ -1,10 +1,11 @@
 "use client";
+import { intlLocale } from "../lib/i18n";
 // Yapay zekâ (MCP) erişim anahtarları: kişi kendi anahtarını oluşturur, şirket içi yapay zekâ istemcisine girer.
 // Yalnız yapay zekâ paketinde ve sistem yöneticisi MCP'yi açtıysa görünür. Süreç paketinde bu dosya yer tutucuyla değişir.
 import React, { useEffect, useState } from "react";
 import { KeyRound, Trash2 } from "lucide-react";
 
-const day = (t?: number) => (t ? new Date(t).toLocaleDateString("tr-TR") : "—");
+const day = (t?: number) => (t ? new Date(t).toLocaleDateString(intlLocale()) : "—");
 
 export default function McpAccess() {
   const [data, setData] = useState<{

@@ -1,10 +1,11 @@
 "use client";
+import { getLocale, intlLocale, translate, untranslate } from "../lib/i18n";
 // Eski sistemden toplu öneri aktarımı (yalnız yönetici, Tanımlar sayfası).
 // Akış: şablonu indir → dosyayı seç (.xlsx/.csv) ya da yapıştır → sunucuda kontrol (dryRun) → özet → onayla.
 // Aktarımda e-posta gitmez, ödül kaydı oluşmaz; sistemde olmayan önerenler pasif kullanıcı olarak açılır.
 import React, { useState } from "react";
 import { Download, History, Undo2, Upload } from "lucide-react";
-import { IMPORT_COLUMNS } from "../lib/proposal-import";
+import { IMPORT_COLUMNS, IMPORT_STATUSES } from "../lib/proposal-import";
 import type { State } from "../lib/model";
 import { download, parseText } from "./user-import";
 
@@ -31,12 +32,23 @@ const ALIASES: Record<string, string[]> = {
   status: ["durum", "statü"],
   score: ["puan", "kaizen puanı"],
 };
+// Başlıklar İngilizce de yazılabilir (şablonun İngilizce hali: lib/i18n/en.json).
 const keyOf = (h: string) =>
   IMPORT_COLUMNS.find(
     (c) =>
       fold(c.label) === fold(h) ||
+      fold(translate(c.label, "en")) === fold(h) ||
       (ALIASES[c.key] || []).some((a) => fold(a) === fold(h)),
   )?.key;
+const english = getLocale() === "en";
+/** İngilizce şablonun örnek satırları (sabit değerler İngilizce; aktarımda Türkçe koda döner). */
+const TEMPLATE_EN = [
+  "OLD-2023-118;14.02.2023;Direction signs in the forklift charging area;The charging area is confusing and people queue;Floor marking and signboard;ali.demir;Ali Demir;Warehouse;;Logistics;Productivity;;;Completed;30.04.2023;;;Monetary;48000;Annual;6500;40 min waiting per day;5 min per day;72;No",
+  "OLD-2023-131;02.03.2023;Packing table height;Back pain complaints;Adjustable table;former.employee;Hasan Ak;Production;;Production;Occupational safety;;;Not implemented;20.05.2023;Budget / investment approval not obtained;Postponed to year end;;;;;;;;No",
+  "OLD-2024-007;10.01.2024;Shared label printer;The printer is far away;A second printer on the line;ayse.kaya;;;;Production;Productivity;;;Unit evaluation;;;;;;;;;;;Yes",
+];
+/** Sabit listelerden gelen değerler İngilizce yazılmışsa Türkçe koduna döner (sunucu Türkçe kodlarla çalışır). */
+const CODED = ["category", "subcategory", "status", "reason", "gainType", "gainPeriod", "anonymous"];
 
 const cell = (v: any) => (v instanceof Date ? v.toISOString().slice(0, 10) : v);
 
@@ -44,12 +56,18 @@ function toRows(table: any[][]) {
   const keys = (table[0] || []).map((h) => keyOf(String(h ?? "")));
   const missing = IMPORT_COLUMNS.filter(
     (c) => c.required && !keys.includes(c.key),
-  ).map((c) => c.label);
+  ).map((c) => translate(c.label));
+  const coded = (k: string, v: any) =>
+    CODED.includes(k) && typeof v === "string"
+      ? untranslate(v, k === "status" ? IMPORT_STATUSES : undefined)
+      : v;
   const rows = table
     .slice(1)
     .filter((r) => r.some((c) => String(c ?? "").trim()))
     .map((r) =>
-      Object.fromEntries(keys.flatMap((k, i) => (k ? [[k, cell(r[i])]] : []))),
+      Object.fromEntries(
+        keys.flatMap((k, i) => (k ? [[k, coded(k, cell(r[i]))]] : [])),
+      ),
     );
   return { rows, missing };
 }
@@ -155,19 +173,19 @@ export default function ProposalImport({
   }
   const template = () =>
     download(
-      "ivme-oneri-aktarim-sablonu.csv",
-      IMPORT_COLUMNS.map((c) => c.label).join(";") +
+      english ? "ivme-proposal-import-template.csv" : "ivme-oneri-aktarim-sablonu.csv",
+      IMPORT_COLUMNS.map((c) => translate(c.label)).join(";") +
         "\n" +
-        [
+        (english ? TEMPLATE_EN : [
           "ESKI-2023-118;14.02.2023;Forklift şarj alanına yön işareti;Şarj alanı karışıyor, sıra bekleniyor;Zemin işaretlemesi ve tabela;ali.demir;Ali Demir;Depo;;Lojistik;Verimlilik;;;Tamamlandı;30.04.2023;;;Parasal;48.000;Yıllık;6.500;Günde 40 dk bekleme;Günde 5 dk;72;Hayır",
           "ESKI-2023-131;02.03.2023;Paketleme masası yüksekliği;Bel ağrısı şikâyeti;Ayarlanabilir masa;eski.calisan;Hasan Ak;Üretim;;Üretim;İş güvenliği;;;Uygulanamadı;20.05.2023;Bütçe / yatırım onayı alınamadı;Yıl sonuna ertelendi;;;;;;;;Hayır",
           "ESKI-2024-007;10.01.2024;Etiket yazıcısı ortak kullanım;Yazıcı uzak;Hatta ikinci yazıcı;ayse.kaya;;;;Üretim;Verimlilik;;;Bölüm değerlendirmesi;;;;;;;;;;;Evet",
-        ].join("\n") +
+        ]).join("\n") +
         "\n",
     );
   const statusText = (p: Preview) =>
     Object.entries(p.byStatus)
-      .map(([k, v]) => `${k}: ${v}`)
+      .map(([k, v]) => `${translate(k)}: ${v}`)
       .join(" · ");
 
   return (
@@ -329,11 +347,11 @@ export default function ProposalImport({
                   return (
                     <tr key={b.id}>
                       <td>{b.id}</td>
-                      <td>{new Date(b.at).toLocaleString("tr-TR")}</td>
+                      <td>{new Date(b.at).toLocaleString(intlLocale())}</td>
                       <td>{who(b.by)}</td>
                       <td>
                         {b.undone
-                          ? `Geri alındı (${new Date(b.undone.at).toLocaleDateString("tr-TR")})`
+                          ? `Geri alındı (${new Date(b.undone.at).toLocaleDateString(intlLocale())})`
                           : left === b.count
                             ? left
                             : `${left} / ${b.count} (bir kısmı silindi)`}

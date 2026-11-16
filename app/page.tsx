@@ -1,4 +1,5 @@
 "use client";
+import { intlLocale, translate } from "../lib/i18n";
 import React, { useEffect, useState } from "react";
 import {
   ArrowUpRight,
@@ -73,6 +74,7 @@ import {
   age,
 } from "../lib/model";
 import DashboardPage from "./dashboard-page";
+import LanguageSwitch from "./language-switch";
 import PersonPicker from "./person-picker";
 import DefinitionsPage from "./definitions-page";
 import SimilarPanel from "./similar-panel";
@@ -400,6 +402,7 @@ export default function App() {
       { username: string; label: string; hint: string }[] | null
     >(null),
     [edition, setEdition] = useState("surec"),
+    [altDemo, setAltDemo] = useState<{ url: string; lang: string; label: string } | null>(null),
     [state, setState] = useState<State | null>(null),
     [users, setUsers] = useState<User[]>([]),
     [version, setVersion] = useState(0),
@@ -571,6 +574,7 @@ export default function App() {
         setDemo(b.demo !== false);
         setShowcase(Array.isArray(b.showcase) ? b.showcase : null);
         setEdition(b.edition === "ai" ? "ai" : "surec");
+        setAltDemo(b.altDemo && typeof b.altDemo.url === "string" ? b.altDemo : null);
         if (!b.demo) setLogin((l) => ({ ...l, username: "" }));
         if (b.error) setError(b.error);
       })
@@ -971,7 +975,7 @@ export default function App() {
             .map(
               (x) =>
                 '"' +
-                String(x ?? "")
+                translate(String(x ?? ""))
                   .replace(/"/g, '""')
                   .replace(/^[=+@-]/, "'") +
                 '"',
@@ -1043,7 +1047,8 @@ export default function App() {
   );
   if (boot)
     return (
-      <div className="loading">
+      // Sunucu bu ekranı Türkçe çizer; tarayıcı seçili dile çevirir (lib/i18n.ts). Fark beklenen bir durumdur.
+      <div className="loading" suppressHydrationWarning>
         <LoaderCircle className="spin" />
         İvme açılıyor…
       </div>
@@ -1051,6 +1056,7 @@ export default function App() {
   if (!user)
     return (
       <main className="login-wrap">
+        <LanguageSwitch className="login-lang" />
         <section className="login-story">
           <div className="brand">
             <span className="brand-mark">
@@ -1111,6 +1117,13 @@ export default function App() {
               <small className="login-foot">
                 Bu demo bir portföy çalışmasıdır · ysfdurak.com
               </small>
+              {altDemo && (
+                <small className="login-foot alt-demo">
+                  <a href={altDemo.url} lang={altDemo.lang}>
+                    {altDemo.label}
+                  </a>
+                </small>
+              )}
             </div>
           )}
           {!showcase && (
@@ -1354,6 +1367,7 @@ export default function App() {
               <LogOut size={17} />
             </button>
           </div>
+          <LanguageSwitch className="side-lang" />
         </div>
       </aside>
       {mobile && (
@@ -1381,7 +1395,7 @@ export default function App() {
               <i /> Güncel
             </span>
             <span className="header-date">
-              {new Date().toLocaleDateString("tr-TR", {
+              {new Date().toLocaleDateString(intlLocale(), {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
@@ -3298,7 +3312,7 @@ export default function App() {
                               return (
                                 <tr key={key}>
                                   <td>
-                                    {new Date(t.at).toLocaleString("tr-TR")}
+                                    {new Date(t.at).toLocaleString(intlLocale())}
                                   </td>
                                   <td>
                                     {kinds[t.kind] || t.kind}
@@ -3830,7 +3844,7 @@ export default function App() {
                                   >
                                     {avg === null
                                       ? "—"
-                                      : avg.toLocaleString("tr-TR", {
+                                      : avg.toLocaleString(intlLocale(), {
                                           maximumFractionDigits: 1,
                                         }) + " gün"}
                                   </td>
@@ -4344,7 +4358,7 @@ export default function App() {
                           </p>
                           <small>
                             {who(h.actor)} ·{" "}
-                            {new Date(h.at).toLocaleDateString("tr-TR")}
+                            {new Date(h.at).toLocaleDateString(intlLocale())}
                           </small>
                         </div>
                       </div>
@@ -4390,7 +4404,7 @@ export default function App() {
                           <div>
                             <small>
                               <b>{who(c.actor)}</b> ·{" "}
-                              {new Date(c.at).toLocaleString("tr-TR")}
+                              {new Date(c.at).toLocaleString(intlLocale())}
                             </small>
                             <p>{c.text}</p>
                           </div>
@@ -4755,7 +4769,7 @@ export default function App() {
                                 {gainFigures(p.gain).paybackMonths !== null
                                   ? gainFigures(
                                       p.gain,
-                                    ).paybackMonths!.toLocaleString("tr-TR") +
+                                    ).paybackMonths!.toLocaleString(intlLocale()) +
                                     " ay"
                                   : p.gain.cost > 0
                                     ? "—"
@@ -4847,7 +4861,7 @@ export default function App() {
                         <span className="timeline-dot" />
                         <div>
                           <small>
-                            {new Date(h.at).toLocaleString("tr-TR")} ·{" "}
+                            {new Date(h.at).toLocaleString(intlLocale())} ·{" "}
                             {who(h.actor)}
                           </small>
                           <p>{h.text}</p>

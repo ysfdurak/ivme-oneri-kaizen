@@ -12,6 +12,11 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { DEFAULT_REWARD_SETTINGS } from "../../lib/rewards";
+import { VERI_EN, FIRST_EN, LAST_EN, LISTS_EN, SCORING_EN, REWARD_LABELS_EN } from "./veri-en";
+import { DEFAULT_LISTS } from "../../lib/definitions";
+// IVME_DIL=en: İngilizce canlı demo verisi (lib/vitrin/en). Veri metinleri İngilizce, sistem kodları Türkçe kalır.
+const EN = process.env.IVME_DIL === "en";
+const L = (x: string) => (EN ? (VERI_EN[x] ?? x) : x);
 let seed = 42;
 const rnd = () =>
   (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
@@ -19,22 +24,22 @@ const pick = <T>(a: T[]) => a[Math.floor(rnd() * a.length)];
 const int = (a: number, b: number) => a + Math.floor(rnd() * (b - a + 1));
 
 const DIRS: Record<string, string[]> = {
-  "Lojistik Müdürlüğü": [
-    "Depo Operasyonları",
-    "Taşıma ve Dağıtım",
-    "Lojistik Planlama",
+  [L("Lojistik Müdürlüğü")]: [
+    L("Depo Operasyonları"),
+    L("Taşıma ve Dağıtım"),
+    L("Lojistik Planlama"),
   ],
-  "Üretim Müdürlüğü": ["Montaj", "Kalite Kontrol", "Bakım Onarım"],
-  "Satın Alma ve Tedarik Zinciri Müdürlüğü": [
-    "Satın Alma",
-    "Tedarikçi Geliştirme",
+  [L("Üretim Müdürlüğü")]: [L("Montaj"), L("Kalite Kontrol"), L("Bakım Onarım")],
+  [L("Satın Alma ve Tedarik Zinciri Müdürlüğü")]: [
+    L("Satın Alma"),
+    L("Tedarikçi Geliştirme"),
   ],
-  "Bilgi Teknolojileri Müdürlüğü": ["Bilgi Teknolojileri"],
-  "Teknik İşler Müdürlüğü": ["Teknik İşler"],
-  "Süreç Geliştirme Müdürlüğü": ["Süreç Geliştirme"],
-  "İnsan Kaynakları Müdürlüğü": ["İnsan Kaynakları"],
+  [L("Bilgi Teknolojileri Müdürlüğü")]: [L("Bilgi Teknolojileri")],
+  [L("Teknik İşler Müdürlüğü")]: [L("Teknik İşler")],
+  [L("Süreç Geliştirme Müdürlüğü")]: [L("Süreç Geliştirme")],
+  [L("İnsan Kaynakları Müdürlüğü")]: [L("İnsan Kaynakları")],
 };
-const first = [
+const firstTr = [
   "Ahmet",
   "Ayşe",
   "Mehmet",
@@ -66,7 +71,7 @@ const first = [
   "Oğuz",
   "Derya",
 ];
-const last = [
+const lastTr = [
   "Yılmaz",
   "Kaya",
   "Demir",
@@ -88,6 +93,8 @@ const last = [
   "Özkan",
   "Şimşek",
 ];
+const first = EN ? FIRST_EN : firstTr;
+const last = EN ? LAST_EN : lastTr;
 type U = any;
 const users: U[] = [];
 let n = 0;
@@ -114,35 +121,35 @@ const mk = (
 };
 const admin = mk(
   "admin",
-  "Süreç Geliştirme Müdürlüğü",
-  "Süreç Geliştirme",
+  L("Süreç Geliştirme Müdürlüğü"),
+  L("Süreç Geliştirme"),
   "",
   "admin",
 );
 // Herkese açık demoda yönetici gerçek bir kişi adı taşımaz.
-admin.name = process.env.IVME_CIKTI ? "Deniz Aktaş" : "Yusuf Durak";
+admin.name = EN ? "Alex Morgan" : process.env.IVME_CIKTI ? "Deniz Aktaş" : "Yusuf Durak";
 const managers: Record<string, U> = {};
 for (const dir of Object.keys(DIRS))
-  managers[dir] = mk("manager", dir, DIRS[dir][0] + " Yönetimi");
-admin.manager = managers["Süreç Geliştirme Müdürlüğü"].id;
+  managers[dir] = mk("manager", dir, DIRS[dir][0] + L(" Yönetimi"));
+admin.manager = managers[L("Süreç Geliştirme Müdürlüğü")].id;
 const OPS: Record<string, string> = {
-  "Mal Kabul": "Lojistik Müdürlüğü",
-  Depolama: "Lojistik Müdürlüğü",
-  Toplama: "Lojistik Müdürlüğü",
-  Sevkiyat: "Lojistik Müdürlüğü",
-  Nakliye: "Lojistik Müdürlüğü",
-  "Montaj Hattı": "Üretim Müdürlüğü",
-  "Kalite Kontrol": "Üretim Müdürlüğü",
-  Bakım: "Üretim Müdürlüğü",
-  "Satın Alma": "Satın Alma ve Tedarik Zinciri Müdürlüğü",
+  [L("Mal Kabul")]: L("Lojistik Müdürlüğü"),
+  [L("Depolama")]: L("Lojistik Müdürlüğü"),
+  [L("Toplama")]: L("Lojistik Müdürlüğü"),
+  [L("Sevkiyat")]: L("Lojistik Müdürlüğü"),
+  [L("Nakliye")]: L("Lojistik Müdürlüğü"),
+  [L("Montaj Hattı")]: L("Üretim Müdürlüğü"),
+  [L("Kalite Kontrol")]: L("Üretim Müdürlüğü"),
+  [L("Bakım")]: L("Üretim Müdürlüğü"),
+  [L("Satın Alma")]: L("Satın Alma ve Tedarik Zinciri Müdürlüğü"),
 };
 const byRole: Record<string, U[]> = {};
 const add = (r: string, u: U) => ((byRole[r] ||= []).push(u), u);
 // değerlendiriciler: her müdürlükte ön değerlendirici, operasyon sorumluları, kazanç ve puanlama
 for (const dir of [
-  "Lojistik Müdürlüğü",
-  "Üretim Müdürlüğü",
-  "Satın Alma ve Tedarik Zinciri Müdürlüğü",
+  L("Lojistik Müdürlüğü"),
+  L("Üretim Müdürlüğü"),
+  L("Satın Alma ve Tedarik Zinciri Müdürlüğü"),
 ]) {
   add(
     "pre:" + dir,
@@ -158,71 +165,71 @@ const gain = add(
   "gain",
   mk(
     "gain",
-    "Süreç Geliştirme Müdürlüğü",
-    "Süreç Geliştirme",
-    managers["Süreç Geliştirme Müdürlüğü"].id,
+    L("Süreç Geliştirme Müdürlüğü"),
+    L("Süreç Geliştirme"),
+    managers[L("Süreç Geliştirme Müdürlüğü")].id,
   ),
 );
 const score = add(
   "score",
   mk(
     "score",
-    "Süreç Geliştirme Müdürlüğü",
-    "Süreç Geliştirme",
-    managers["Süreç Geliştirme Müdürlüğü"].id,
+    L("Süreç Geliştirme Müdürlüğü"),
+    L("Süreç Geliştirme"),
+    managers[L("Süreç Geliştirme Müdürlüğü")].id,
   ),
 );
 mk(
   "support",
-  "Bilgi Teknolojileri Müdürlüğü",
-  "Bilgi Teknolojileri",
-  managers["Bilgi Teknolojileri Müdürlüğü"].id,
+  L("Bilgi Teknolojileri Müdürlüğü"),
+  L("Bilgi Teknolojileri"),
+  managers[L("Bilgi Teknolojileri Müdürlüğü")].id,
   "it",
 );
 mk(
   "support",
-  "Teknik İşler Müdürlüğü",
-  "Teknik İşler",
-  managers["Teknik İşler Müdürlüğü"].id,
+  L("Teknik İşler Müdürlüğü"),
+  L("Teknik İşler"),
+  managers[L("Teknik İşler Müdürlüğü")].id,
   "teknik",
 );
 // Ödül sorumlusu (İK): puanlanan önerilerin ödül kararını verir.
 mk(
   "reward",
-  "İnsan Kaynakları Müdürlüğü",
-  "İnsan Kaynakları",
-  managers["İnsan Kaynakları Müdürlüğü"].id,
+  L("İnsan Kaynakları Müdürlüğü"),
+  L("İnsan Kaynakları"),
+  managers[L("İnsan Kaynakları Müdürlüğü")].id,
   "ik",
 );
 const employees: U[] = [];
 for (let i = 0; i < 26; i++) {
   const dir = pick([
-    "Lojistik Müdürlüğü",
-    "Lojistik Müdürlüğü",
-    "Üretim Müdürlüğü",
-    "Üretim Müdürlüğü",
-    "Satın Alma ve Tedarik Zinciri Müdürlüğü",
+    L("Lojistik Müdürlüğü"),
+    L("Lojistik Müdürlüğü"),
+    L("Üretim Müdürlüğü"),
+    L("Üretim Müdürlüğü"),
+    L("Satın Alma ve Tedarik Zinciri Müdürlüğü"),
   ]);
   employees.push(mk("employee", dir, pick(DIRS[dir]), managers[dir].id));
 }
 employees[0].id = "calisan";
 employees[0].username = "calisan";
 // kullanıcı adları sabit: admin, calisan, on.lojistik, op.lojistik1, mudur.lojistik
-byRole["pre:Lojistik Müdürlüğü"][0].username = "on.lojistik";
-byRole["operation:Lojistik Müdürlüğü"][0].username = "op.lojistik";
-managers["Lojistik Müdürlüğü"].username = "mudur.lojistik";
-managers["Üretim Müdürlüğü"].username = "mudur.uretim";
+byRole["pre:" + L("Lojistik Müdürlüğü")][0].username = "on.lojistik";
+byRole["operation:" + L("Lojistik Müdürlüğü")][0].username = "op.lojistik";
+managers[L("Lojistik Müdürlüğü")].username = "mudur.lojistik";
+managers[L("Üretim Müdürlüğü")].username = "mudur.uretim";
 // Direktör ve genel müdür: unvan birimi "directorate" alanında tutulur.
 const director = mk(
   "director",
-  "Operasyon Direktörlüğü",
-  "Operasyon Direktörlüğü",
+  L("Operasyon Direktörlüğü"),
+  L("Operasyon Direktörlüğü"),
   "",
   "direktor",
 );
-const gmUser = mk("gm", "Genel Müdürlük", "Genel Müdürlük", "", "genelmudur");
-managers["Lojistik Müdürlüğü"].manager = director.id;
-managers["Üretim Müdürlüğü"].manager = director.id;
+const gmUser = mk("gm", L("Genel Müdürlük"), L("Genel Müdürlük"), "", "genelmudur");
+managers[L("Lojistik Müdürlüğü")].manager = director.id;
+managers[L("Üretim Müdürlüğü")].manager = director.id;
 director.manager = gmUser.id;
 
 const matrix = Object.entries(OPS).map(([operation, dir]) => ({
@@ -238,38 +245,57 @@ const s: any = {
   matrix,
   audit: [],
   proposals: [],
-  units: ["IT", "Teknik İşler", "Saha Operasyonu", "Satın Alma"],
+  units: ["IT", L("Teknik İşler"), L("Saha Operasyonu"), L("Satın Alma")],
   settings: {
     disabledReports: [],
     // Ödül kuralları örnek değerlerle açık: puanlanan önerilerde İK'ya ödül kaydı düşer.
-    rewards: { ...DEFAULT_REWARD_SETTINGS, enabled: true },
+    rewards: {
+      ...DEFAULT_REWARD_SETTINGS,
+      enabled: true,
+      rules: DEFAULT_REWARD_SETTINGS.rules.map((r) => ({ ...r, label: EN ? REWARD_LABELS_EN[r.label] || r.label : r.label })),
+    },
+    // İngilizce demoda listeler ve puan kriterleri İngilizce adlarla kaydedilir (kilitli maddeler Türkçe kod).
+    ...(EN
+      ? {
+          lists: Object.fromEntries(
+            Object.entries(LISTS_EN).map(([key, names]) => [
+              key,
+              names.map((name, i) => {
+                const base = (DEFAULT_LISTS as any)[key][i];
+                return { ...(base || {}), id: base?.id || "m" + i, name, active: true };
+              }),
+            ]),
+          ),
+          scoring: SCORING_EN,
+        }
+      : {}),
     locations: [
-      "A blok raf 12-18",
-      "Hat 2",
-      "Kalite giriş masası",
-      "Rampa 3",
-      "Sevkiyat sahası",
-      "Şarj alanı",
+      L("A blok raf 12-18"),
+      L("Hat 2"),
+      L("Kalite giriş masası"),
+      L("Rampa 3"),
+      L("Sevkiyat sahası"),
+      L("Şarj alanı"),
     ],
     // Hiyerarşi: Departman → Müdürlük → Direktörlük → Genel Müdürlük (üst iki seviye açık).
     org: {
       departments: Object.entries(DIRS).flatMap(([dir, depts]) =>
-        [...depts, depts[0] + " Yönetimi"].map((name) => ({
+        [...depts, depts[0] + L(" Yönetimi")].map((name) => ({
           name,
           directorate: dir,
         })),
       ),
       directorates: Object.keys(DIRS).map((name) => ({
         name,
-        division: ["Lojistik Müdürlüğü", "Üretim Müdürlüğü"].includes(name)
-          ? "Operasyon Direktörlüğü"
-          : "Destek Hizmetleri Direktörlüğü",
+        division: [L("Lojistik Müdürlüğü"), L("Üretim Müdürlüğü")].includes(name)
+          ? L("Operasyon Direktörlüğü")
+          : L("Destek Hizmetleri Direktörlüğü"),
       })),
       divisions: [
-        { name: "Operasyon Direktörlüğü", group: "Genel Müdürlük" },
-        { name: "Destek Hizmetleri Direktörlüğü", group: "Genel Müdürlük" },
+        { name: L("Operasyon Direktörlüğü"), group: L("Genel Müdürlük") },
+        { name: L("Destek Hizmetleri Direktörlüğü"), group: L("Genel Müdürlük") },
       ],
-      groups: ["Genel Müdürlük"],
+      groups: [L("Genel Müdürlük")],
       levels: { division: true, group: true },
     },
   },
@@ -277,70 +303,70 @@ const s: any = {
 const get = (id: string) => users.find((u) => u.id === id);
 const call = (b: any, u: U) => applyCommand(s, b, u, users);
 const TITLES: Record<string, string[]> = {
-  "Mal Kabul": [
-    "Randevu saatlerinin araç tipine göre ayrılması",
-    "Irsaliye kontrolünün el terminaline taşınması",
-    "Hasarlı koli fotoğrafının kabulde zorunlu olması",
-    "Rampa önünde palet birikmesinin önlenmesi",
+  [L("Mal Kabul")]: [
+    L("Randevu saatlerinin araç tipine göre ayrılması"),
+    L("Irsaliye kontrolünün el terminaline taşınması"),
+    L("Hasarlı koli fotoğrafının kabulde zorunlu olması"),
+    L("Rampa önünde palet birikmesinin önlenmesi"),
   ],
-  Depolama: [
-    "Raf adres etiketlerinin büyütülmesi",
-    "Hızlı dönen ürünlerin bel hizasına alınması",
-    "Boş lokasyonların günlük raporlanması",
-    "Yangın koridorlarının zemin işaretlemesi",
+  [L("Depolama")]: [
+    L("Raf adres etiketlerinin büyütülmesi"),
+    L("Hızlı dönen ürünlerin bel hizasına alınması"),
+    L("Boş lokasyonların günlük raporlanması"),
+    L("Yangın koridorlarının zemin işaretlemesi"),
   ],
-  Toplama: [
-    "Toplama rotasının dalga bazlı planlanması",
-    "Sesli toplama pilotu",
-    "Eksik toplama için anlık uyarı",
-    "Toplama arabalarına bölmeli kasa",
+  [L("Toplama")]: [
+    L("Toplama rotasının dalga bazlı planlanması"),
+    L("Sesli toplama pilotu"),
+    L("Eksik toplama için anlık uyarı"),
+    L("Toplama arabalarına bölmeli kasa"),
   ],
-  Sevkiyat: [
-    "Sevkiyat etiketlerinde çift kontrol",
-    "Yükleme sırasının rota sırasına göre yapılması",
-    "Streç tüketiminin standartlaştırılması",
-    "Araç doluluk oranının artırılması",
+  [L("Sevkiyat")]: [
+    L("Sevkiyat etiketlerinde çift kontrol"),
+    L("Yükleme sırasının rota sırasına göre yapılması"),
+    L("Streç tüketiminin standartlaştırılması"),
+    L("Araç doluluk oranının artırılması"),
   ],
-  Nakliye: [
-    "Boş dönüşlerin planlanması",
-    "Sürücü teslim belgelerinin dijitalleşmesi",
-    "Yakıt tüketiminin rota bazında izlenmesi",
+  [L("Nakliye")]: [
+    L("Boş dönüşlerin planlanması"),
+    L("Sürücü teslim belgelerinin dijitalleşmesi"),
+    L("Yakıt tüketiminin rota bazında izlenmesi"),
   ],
-  "Montaj Hattı": [
-    "Vida sıkma torkunun hat başında doğrulanması",
-    "Hat dengesizliğinin istasyon yeniden dağılımıyla giderilmesi",
-    "Malzeme besleme sıklığının kanbanla yönetilmesi",
-    "Operatör değişiminde standart iş kartı",
+  [L("Montaj Hattı")]: [
+    L("Vida sıkma torkunun hat başında doğrulanması"),
+    L("Hat dengesizliğinin istasyon yeniden dağılımıyla giderilmesi"),
+    L("Malzeme besleme sıklığının kanbanla yönetilmesi"),
+    L("Operatör değişiminde standart iş kartı"),
   ],
-  "Kalite Kontrol": [
-    "Giriş kalitede numune sayısının risk bazlı belirlenmesi",
-    "Hata kodlarının tek listede toplanması",
-    "Ölçüm cihazı kalibrasyon hatırlatması",
+  [L("Kalite Kontrol")]: [
+    L("Giriş kalitede numune sayısının risk bazlı belirlenmesi"),
+    L("Hata kodlarının tek listede toplanması"),
+    L("Ölçüm cihazı kalibrasyon hatırlatması"),
   ],
-  Bakım: [
-    "Kompresör kaçaklarının haftalık taranması",
-    "Otonom bakım kontrol listesi",
-    "Yedek parça minimum stok takibi",
-    "Forklift şarj alanında görsel yönlendirme",
+  [L("Bakım")]: [
+    L("Kompresör kaçaklarının haftalık taranması"),
+    L("Otonom bakım kontrol listesi"),
+    L("Yedek parça minimum stok takibi"),
+    L("Forklift şarj alanında görsel yönlendirme"),
   ],
-  "Satın Alma": [
-    "Tedarikçi teslim performansının aylık paylaşılması",
-    "Ambalaj malzemesinde tek tedarikçi riskinin azaltılması",
-    "Sipariş onay adımlarının sadeleştirilmesi",
+  [L("Satın Alma")]: [
+    L("Tedarikçi teslim performansının aylık paylaşılması"),
+    L("Ambalaj malzemesinde tek tedarikçi riskinin azaltılması"),
+    L("Sipariş onay adımlarının sadeleştirilmesi"),
   ],
 };
 const PROBS = [
-  "Vardiya başında aynı iş iki kez yapılıyor ve yaklaşık 20 dakika kayboluyor.",
-  "Elle yapılan kontrol nedeniyle ayda ortalama 6-8 hata müşteriye ulaşıyor.",
-  "Operatörler malzeme bulmak için hat dışına çıkıyor, hat duruyor.",
-  "Bilgi kâğıt üzerinde tutulduğu için geçmişe dönük analiz yapılamıyor.",
-  "Ergonomik olmayan duruş nedeniyle şikâyetler artıyor.",
+  L("Vardiya başında aynı iş iki kez yapılıyor ve yaklaşık 20 dakika kayboluyor."),
+  L("Elle yapılan kontrol nedeniyle ayda ortalama 6-8 hata müşteriye ulaşıyor."),
+  L("Operatörler malzeme bulmak için hat dışına çıkıyor, hat duruyor."),
+  L("Bilgi kâğıt üzerinde tutulduğu için geçmişe dönük analiz yapılamıyor."),
+  L("Ergonomik olmayan duruş nedeniyle şikâyetler artıyor."),
 ];
 const SOLS = [
-  "Basit bir görsel işaretleme ve standart iş kartı ile adımların netleştirilmesi.",
-  "El terminaline okutma adımı eklenerek kontrolün sistemden yapılması.",
-  "Malzemenin kullanım noktasına yakın konumlandırılması ve kanban kartı.",
-  "Excel yerine ortak ekranda takip ve haftalık gözden geçirme toplantısı.",
+  L("Basit bir görsel işaretleme ve standart iş kartı ile adımların netleştirilmesi."),
+  L("El terminaline okutma adımı eklenerek kontrolün sistemden yapılması."),
+  L("Malzemenin kullanım noktasına yakın konumlandırılması ve kanban kartı."),
+  L("Excel yerine ortak ekranda takip ve haftalık gözden geçirme toplantısı."),
 ];
 // hedef durum dağılımı. IVME_OLCEK=0.4 gibi bir değerle daha küçük veri üretilir (canlı demo için).
 const SCALE = Number(process.env.IVME_OLCEK || 1);
@@ -372,38 +398,38 @@ for (const target of targets) {
     {
       action: "create",
       title: long
-        ? "Sevkiyat alanında yükleme öncesi palet etiketlerinin, sipariş numarası ve müşteri bilgisiyle el terminalinden çift kontrol edilerek yanlış araç yüklemesinin tamamen önlenmesi"
+        ? L("Sevkiyat alanında yükleme öncesi palet etiketlerinin, sipariş numarası ve müşteri bilgisiyle el terminalinden çift kontrol edilerek yanlış araç yüklemesinin tamamen önlenmesi")
         : pick(TITLES[op]),
       problem: pick(PROBS) + (long ? " " + PROBS.join(" ") : ""),
       solution: pick(SOLS),
       operation: op,
       category: pick([
-        "Verimlilik",
-        "Kalite",
-        "Maliyet",
-        "İş güvenliği",
-        "Ergonomi",
-        "Çevre",
+        L("Verimlilik"),
+        L("Kalite"),
+        L("Maliyet"),
+        L("İş güvenliği"),
+        L("Ergonomi"),
+        L("Çevre"),
       ]),
       attachments:
-        rnd() < 0.2 ? [{ name: "saha-fotografi.png", data: smallPng }] : [],
+        rnd() < 0.2 ? [{ name: L("saha-fotografi.png"), data: smallPng }] : [],
       location:
         rnd() < 0.6
           ? pick([
-              "Rampa 3",
-              "A blok raf 12-18",
-              "Hat 2",
-              "Kalite giriş masası",
-              "Şarj alanı",
-              "Sevkiyat sahası",
+              L("Rampa 3"),
+              L("A blok raf 12-18"),
+              L("Hat 2"),
+              L("Kalite giriş masası"),
+              L("Şarj alanı"),
+              L("Sevkiyat sahası"),
             ])
           : "",
       expectedBenefit:
         rnd() < 0.5
           ? pick([
-              "Vardiya başına ~15 dk kazanç",
-              "Ayda 5-6 hata önlenir",
-              "Forklift trafiğinde güvenlik artar",
+              L("Vardiya başına ~15 dk kazanç"),
+              L("Ayda 5-6 hata önlenir"),
+              L("Forklift trafiğinde güvenlik artar"),
             ])
           : "",
       coAuthors:
@@ -423,9 +449,9 @@ for (const target of targets) {
           action: "revision",
           id,
           reason: pick([
-            "Fotoğraf ekleyin.",
-            "Hangi vardiyada olduğunu yazın.",
-            "Tahmini faydayı belirtin.",
+            L("Fotoğraf ekleyin."),
+            L("Hangi vardiyada olduğunu yazın."),
+            L("Tahmini faydayı belirtin."),
           ]),
         },
         as(p.owner),
@@ -437,8 +463,8 @@ for (const target of targets) {
         {
           action: "reject",
           id,
-          reason: "Ön değerlendirmede uygun bulunmadı.",
-          reasonCode: pick(REJECT_REASONS),
+          reason: L("Ön değerlendirmede uygun bulunmadı."),
+          reasonCode: pick(EN ? LISTS_EN.rejectReasons : REJECT_REASONS),
         },
         as(p.owner),
       );
@@ -448,7 +474,7 @@ for (const target of targets) {
       {
         action: "accept",
         id,
-        note: rnd() < 0.3 ? "Saha ziyareti yapıldı, öneri yerinde." : undefined,
+        note: rnd() < 0.3 ? L("Saha ziyareti yapıldı, öneri yerinde.") : undefined,
       },
       as(p.owner),
     );
@@ -458,8 +484,8 @@ for (const target of targets) {
         {
           action: "reject",
           id,
-          reason: "Operasyon değerlendirmesinde uygun bulunmadı.",
-          reasonCode: rnd() < 0.15 ? undefined : pick(REJECT_REASONS),
+          reason: L("Operasyon değerlendirmesinde uygun bulunmadı."),
+          reasonCode: rnd() < 0.15 ? undefined : pick(EN ? LISTS_EN.rejectReasons : REJECT_REASONS),
         },
         as(p.owner),
       );
@@ -470,7 +496,7 @@ for (const target of targets) {
         {
           action: "comment",
           id,
-          text: "Bu öneri için hangi vardiyada ölçüm yapıldı?",
+          text: L("Bu öneri için hangi vardiyada ölçüm yapıldı?"),
         },
         as(p.owner),
       );
@@ -479,7 +505,7 @@ for (const target of targets) {
         {
           action: "comment",
           id,
-          text: "Sabah vardiyasında, 3 gün boyunca ölçtük.",
+          text: L("Sabah vardiyasında, 3 gün boyunca ölçtük."),
         },
         as(p.author),
       );
@@ -490,7 +516,7 @@ for (const target of targets) {
           {
             action: "addAction",
             id,
-            title: "Mevcut durumu ölç",
+            title: L("Mevcut durumu ölç"),
             owner: p.owner,
             due: "2026-11-20",
           },
@@ -509,12 +535,12 @@ for (const target of targets) {
           action: "addAction",
           id,
           title: pick([
-            "Pilot uygulama",
-            "Görsel işaretleme",
-            "Standart iş kartı hazırla",
-            "Ekip eğitimi",
-            "Sonuç ölçümü",
-            "Tedarikçi ile görüşme",
+            L("Pilot uygulama"),
+            L("Görsel işaretleme"),
+            L("Standart iş kartı hazırla"),
+            L("Ekip eğitimi"),
+            L("Sonuç ölçümü"),
+            L("Tedarikçi ile görüşme"),
           ]),
           owner: pick(actionOwners).id,
           due:
@@ -527,7 +553,7 @@ for (const target of targets) {
       );
     call({ action: "start", id }, as(p.owner));
     if (target === "İptal edildi") {
-      call({ action: "cancel", id, reason: "Proje kapsamı değişti." }, admin);
+      call({ action: "cancel", id, reason: L("Proje kapsamı değişti.") }, admin);
       continue;
     }
     if (target === STAGES[3]) {
@@ -543,7 +569,7 @@ for (const target of targets) {
             as(p.owner),
           );
       if (rnd() < 0.35) {
-        const unit = pick(["IT", "Teknik İşler", "Satın Alma"]);
+        const unit = pick(["IT", L("Teknik İşler"), L("Satın Alma")]);
         call({ action: "supportFlag", id, unit, selected: true }, as(p.owner));
         const item: any = p.support.find(
           (x: any) => x.unit === unit && x.status === "Bekliyor",
@@ -562,8 +588,8 @@ for (const target of targets) {
                 ticket:
                   (unit === "IT"
                     ? "INC-"
-                    : unit === "Teknik İşler"
-                      ? "İE-2026-"
+                    : unit === L("Teknik İşler")
+                      ? (EN ? "WO-2026-" : "İE-2026-")
                       : "SAT-") + Math.floor(rnd() * 90000 + 10000),
               },
               as(p.owner),
@@ -581,7 +607,7 @@ for (const target of targets) {
             id,
             itemId: p.actions[0].id,
             status: "Yapılamadı",
-            reason: "Tedarikçi malzemeyi sağlayamadı",
+            reason: L("Tedarikçi malzemeyi sağlayamadı"),
           },
           as(p.owner),
         );
@@ -590,11 +616,11 @@ for (const target of targets) {
           action: "finish",
           id,
           outcome: "notImplemented",
-          reasonCode: pick(NOT_IMPLEMENTED_REASONS.slice(0, 6)),
+          reasonCode: pick((EN ? LISTS_EN.notImplementedReasons : NOT_IMPLEMENTED_REASONS).slice(0, 6)),
           reason: pick([
-            "Yatırım bütçesi gelecek yıla kaldı.",
-            "Saha denemesinde beklenen sonuç alınamadı.",
-            "Hat yerleşimi değiştiği için öneri geçersiz kaldı.",
+            L("Yatırım bütçesi gelecek yıla kaldı."),
+            L("Saha denemesinde beklenen sonuç alınamadı."),
+            L("Hat yerleşimi değiştiği için öneri geçersiz kaldı."),
           ]),
         },
         as(p.owner),
@@ -618,18 +644,18 @@ for (const target of targets) {
         period: pick(["Tek seferlik", "Aylık", "Yıllık", "Yıllık"]),
         type: money
           ? "Parasal"
-          : pick(["Zaman", "Kalite", "İş güvenliği", "Ergonomi"]),
-        before: "Önce 20 dk",
-        after: "Sonra 8 dk",
+          : pick([L("Zaman"), L("Kalite"), L("İş güvenliği"), L("Ergonomi")]),
+        before: L("Önce 20 dk"),
+        after: L("Sonra 8 dk"),
         explanation:
-          "Vardiya başına 12 dakika × 3 vardiya × 250 gün üzerinden hesaplandı.",
+          L("Vardiya başına 12 dakika × 3 vardiya × 250 gün üzerinden hesaplandı."),
       },
       as(p.owner),
     );
     if (target === STAGES[5]) continue;
     if (target === "Kazanç düzeltmesi bekliyor") {
       call(
-        { action: "gainReturn", id, reason: "Hesaplama varsayımı eksik." },
+        { action: "gainReturn", id, reason: L("Hesaplama varsayımı eksik.") },
         as(p.owner),
       );
       continue;
@@ -701,7 +727,7 @@ for (const p of s.proposals) {
   if (p.gain?.approvedAt) p.gain.approvedAt = p.stageAt;
 }
 // bir kullanıcı ayrıldı: açık işleri üzerinde kalmış (uç durum)
-const leaver = byRole["operation:Üretim Müdürlüğü"][0];
+const leaver = byRole["operation:" + L("Üretim Müdürlüğü")][0];
 leaver.active = 0;
 s.proposals.sort((a: any, b: any) => b.created.localeCompare(a.created));
 // Ödül örnekleri: bir kısmı İK tarafından onaylanmış, bir kısmı ödenmiş.
@@ -729,25 +755,25 @@ s.settings = {
   campaigns: [
     {
       id: "k-isg-ayi",
-      title: "İş güvenliği ayı",
-      description: "Ramak kala ve ergonomi riskleri",
+      title: L("İş güvenliği ayı"),
+      description: L("Ramak kala ve ergonomi riskleri"),
       start: d(-45),
       end: d(10),
-      category: "İş güvenliği",
-      reward: "En yüksek puanlı 3 öneri ay sonu toplantısında ödüllendirilir",
+      category: L("İş güvenliği"),
+      reward: L("En yüksek puanlı 3 öneri ay sonu toplantısında ödüllendirilir"),
     },
     {
       id: "k-ambalaj",
-      title: "Ambalaj israfı",
+      title: L("Ambalaj israfı"),
       start: d(15),
       end: d(45),
-      category: "Maliyet",
+      category: L("Maliyet"),
     },
   ],
 };
 for (const p of s.proposals) {
   if (
-    p.category === "İş güvenliği" &&
+    p.category === L("İş güvenliği") &&
     p.created >= new Date(t0 - 45 * 86400000).toISOString()
   )
     p.campaign = "k-isg-ayi";

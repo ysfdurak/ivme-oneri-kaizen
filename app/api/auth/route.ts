@@ -13,6 +13,15 @@ import {
   showcase,
 } from "../../../lib/server";
 import { SHOWCASE_ROLES, SHOWCASE_USERNAMES } from "../../../lib/vitrin";
+import { env } from "cloudflare:workers";
+import { localeFrom } from "../../../lib/i18n";
+/** Vitrinde öteki dildeki demoya bağlantı (IVME_ALT_DEMO_URL). Bağlantı metni o demonun dilindedir. */
+function altDemo() {
+  const url = String((env as any).IVME_ALT_DEMO_URL || "").trim();
+  if (!/^https:\/\//.test(url)) return null;
+  const lang = localeFrom((env as any).IVME_LANG) === "en" ? "tr" : "en";
+  return { url, lang, label: lang === "en" ? "English demo with English sample data →" : "Türkçe örnek veriyle Türkçe demo →" };
+}
 // Kullanıcı adının var olup olmadığı veya hesabın kilitli olduğu dışarıdan anlaşılmasın diye tek mesaj kullanılır.
 const LOGIN_FAILED =
   "Kullanıcı adı veya şifre yanlış. Art arda 5 hatalı denemede hesap 5 dakika kilitlenir.";
@@ -24,7 +33,7 @@ export async function GET(req: Request) {
       user: user ? publicUser(user) : null,
       demo: demoMode(),
       edition: edition(),
-      ...(showcase() ? { showcase: SHOWCASE_ROLES } : {}),
+      ...(showcase() ? { showcase: SHOWCASE_ROLES, altDemo: altDemo() } : {}),
     });
   } catch {
     return json({ error: "Veri tabanına erişilemiyor." }, 503);

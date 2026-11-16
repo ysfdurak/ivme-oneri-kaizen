@@ -1,3 +1,4 @@
+import { translate as tr } from "../../../lib/i18n";
 import { current, db, json, sameOrigin, users } from "../../../lib/server";
 import { migrateState } from "../../../lib/migrate";
 import { providerInfo } from "../../../lib/mailer";
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
     const me: any = await db().prepare("SELECT id,email FROM users WHERE id=?").bind(u.id).first();
     if (!me?.email) return json({ error: "Önce Kullanıcılar sayfasından kendi e-posta adresini gir." }, 400);
     const { html, text } = renderEmail("Test e-postası", ["İvme e-posta bildirimleri çalışıyor.", "Sağlayıcı: " + providerInfo().detail], { url: appUrl(req), label: "İvme'yi aç" });
-    await enqueue([{ userId: me.id, email: me.email, subject: "[İvme] Test e-postası", html, text, eventKey: "test" }]);
+    await enqueue([{ userId: me.id, email: me.email, subject: tr("[İvme] Test e-postası"), html, text, eventKey: "test" }]);
     const r = await processOutbox(5);
     return json({ ok: true, ...r, provider: providerInfo() });
   }

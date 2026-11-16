@@ -5,8 +5,18 @@
 import { db, ensureBaseSchema } from "./server";
 import { ensureSchema } from "./outbox";
 import { ensureTokenSchema } from "./tokens";
+import { getLocale } from "./i18n";
 import demoState from "./vitrin/state.json";
 import demoUsers from "./vitrin/users.json";
+// İngilizce demo (IVME_LANG=en): aynı yapıda, İngilizce metinli örnek veri.
+//   IVME_DIL=en IVME_OLCEK=0.4 IVME_CIKTI=lib/vitrin/en npx tsx scripts/test-verisi/uret.ts
+import demoStateEn from "./vitrin/en/state.json";
+import demoUsersEn from "./vitrin/en/users.json";
+/** Kurulumun diline göre vitrin verisi. */
+export const showcaseData = () =>
+  getLocale() === "en"
+    ? { state: demoStateEn as any, users: demoUsersEn as any[] }
+    : { state: demoState as any, users: demoUsers as any[] };
 
 export const SHOWCASE_ROLES: {
   username: string;
@@ -70,7 +80,8 @@ export async function resetShowcase(now = Date.now()) {
   await ensureBaseSchema();
   await ensureSchema();
   await ensureTokenSchema();
-  const { _builtAt, ...state } = demoState as any;
+  const demo = showcaseData();
+  const { _builtAt, ...state } = demo.state;
   const data = rebase(JSON.stringify(state), _builtAt, now);
   const ins = (u: any) =>
     db()
@@ -96,7 +107,7 @@ export async function resetShowcase(now = Date.now()) {
     db().prepare("DELETE FROM outbox"),
     db().prepare("DELETE FROM api_tokens"),
     db().prepare("DELETE FROM kv"),
-    ...(demoUsers as any[]).map(ins),
+    ...demo.users.map(ins),
     db()
       .prepare("INSERT INTO workspace (id,data,version) VALUES ('main',?,1)")
       .bind(data),

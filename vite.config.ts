@@ -5,6 +5,21 @@ import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 import { configureToolEnvironment } from "./scripts/tool-environment.mjs";
 import { sites } from "./scripts/vite/sites-vite-plugin";
 import { connectorPreview } from "./scripts/vite/connector-preview-plugin.mjs";
+import { fileURLToPath } from "node:url";
+
+// Dil desteği: tarayıcı derlemesinde React JSX çalışma zamanı app/i18n-jsx.ts ile sarılır (lib/i18n.ts).
+// Yalnız "client" ortamında; sunucu tarafı (rsc, ssr) değişmez. Sarmalayıcının kendi içe aktarması gerçek modüle gider.
+const I18N_JSX = fileURLToPath(new URL("./app/i18n-jsx.ts", import.meta.url));
+const i18nJsx = () => ({
+  name: "ivme-i18n-jsx",
+  enforce: "pre" as const,
+  applyToEnvironment: (environment: { name: string }) => environment.name === "client",
+  resolveId(id: string, importer?: string) {
+    if ((id === "react/jsx-runtime" || id === "react/jsx-dev-runtime") && importer && importer !== I18N_JSX)
+      return I18N_JSX;
+    return null;
+  },
+});
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
@@ -53,6 +68,7 @@ export default defineConfig(async ({ command }) => {
         : {}),
     },
     plugins: [
+      i18nJsx(),
       vinext(),
       sites({ mockAuth: !managedLinux }),
       connectorPreview(),

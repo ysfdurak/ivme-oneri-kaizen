@@ -1,4 +1,5 @@
 "use client";
+import { intlLocale } from "../lib/i18n";
 // Tanımlar → E-posta bildirimleri: sağlayıcı durumu, kural tablosu (aç/kapa), müdüre bildirim günü,
 // test e-postası ve giden kutusu. Sağlayıcı (Outlook/Graph, web kancası) sunucu ortam değişkenlerinden seçilir.
 import React, { useEffect, useState } from "react";
@@ -184,7 +185,7 @@ export default function NotifySettings({ state, busy, who, command, alert }: Pro
             <tbody>
               {info.rows.map((r: any) => (
                 <tr key={r.id}>
-                  <td>{new Date(r.created_at).toLocaleString("tr-TR")}</td>
+                  <td>{new Date(r.created_at).toLocaleString(intlLocale())}</td>
                   <td>
                     {who(r.user_id)}
                     <small className="cell-sub">{r.email}</small>

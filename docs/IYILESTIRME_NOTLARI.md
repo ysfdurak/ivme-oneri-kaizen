@@ -458,3 +458,14 @@ Tanımlar → **Eski önerileri aktar** (yalnız sistem yöneticisi). Ayrıntıl
 - **Lokasyon alanı:** "Liste Tanımlar sayfasından yönetilir" notu yalnız yöneticiye gösterilir; diğer kullanıcılar "Sorunun yaşandığı yer" görür.
 - **"Hangi birimi bekliyoruz?" kartı:** sayı iki kez yazılmıyor; bekleyen yoksa "Bekleyen öneri yok", varsa "N öneri bu birimin desteğini bekliyor".
 - Kontrol: 19 test grubu geçti; 6 rol masaüstü ve telefonda axe 0 ihlal.
+
+# Türkçe / English arayüz ve İngilizce canlı demo (15 Kasım 2026)
+- **Tek sözlük, metin sarmadan çeviri:** kaynak dil Türkçe, İngilizcesi `lib/i18n/en.json` (2.100+ girdi). Tarayıcıda JSX çalışma zamanı `app/i18n-jsx.ts` ile sarılır; ekrana giden metin ve `title` / `placeholder` / `aria-label` / `alt` nitelikleri çevrilir. Türkçede davranış aynen korunur. Ayrıntı: [DIL_DESTEGI.md](DIL_DESTEGI.md).
+- **Veri kodları Türkçe:** aşamalar, kapanış durumları, roller ve kilitli maddeler veritabanında Türkçe kalır, yalnız ekranda çevrilir. Süreç kuralları ve testler değişmedi.
+- **Dil seçimi:** `?lang=en|tr` → TR/EN düğmesi (çerez) → `IVME_LANG`. Giriş ekranında ve menünün altında TR/EN düğmesi.
+- **Sunucu tarafı:** e-postalar (anında, günlük özet, toplu) ve MCP araç açıklamaları / sonuçlarındaki sabitler kurulumun dilinde.
+- **Dosyalar:** CSV dışa aktarımları seçili dilde. Kullanıcı ve öneri aktarım şablonlarının İngilizce hali var; İngilizce başlıklar ve sabitler (`Completed`, `Employee`, `Yes`) aktarımda Türkçe koduna döner.
+- **Biçimler:** sayı ve tarih `en-GB` / `tr-TR`, yüzde `14%` / `%14`.
+- **İngilizce canlı demo:** aynı koddan ayrı Worker `ivme-en` ve ayrı veritabanı (`wrangler.jsonc → env.en`). Örnek veri `lib/vitrin/en/` altında; üretici aynı rastgele sırayı kullandığı için Türkçe demoyla aynı yapıda. Giriş ekranında öteki dildeki demoya bağlantı (`IVME_ALT_DEMO_URL`).
+- **Kapsam denetimi:** `scripts/i18n/anahtarlar.mjs` kaynak koddaki Türkçe metinleri bulur, sözlükte karşılığı olmayanları listeler. `tests/i18n.test.ts` bunu sıkı modda çalıştırır; ayrıca yer tutucu tutarlılığı, çoğul, JSX parçaları, geri çeviri, İngilizce e-posta ve İngilizce demo verisi sınanır.
+- Kontrol: 20 test grubu geçti. İngilizce demoda 6 rolün bütün sayfaları, öneri formu, detay sekmeleri ve işlem pencereleri tarayıcıda gezildi; Türkçe kalan arayüz metni yok. Giriş ve ana sayfa iki dilde masaüstü ve telefonda axe 0 ihlal.

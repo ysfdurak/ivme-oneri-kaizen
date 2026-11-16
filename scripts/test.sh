@@ -16,9 +16,10 @@ node "$TSX" tests/round10.test.ts
 node "$TSX" tests/round11.test.ts
 node "$TSX" tests/round12.test.ts
 node "$TSX" tests/vitrin.test.ts
+node "$TSX" tests/i18n.test.ts
 rm -rf /tmp/kaizen-server-tests
 node_modules/.bin/tsc lib/*.ts app/api/*/route.ts --outDir /tmp/kaizen-server-tests --module commonjs --target es2022 --moduleResolution node --skipLibCheck --esModuleInterop --types @cloudflare/workers-types,node >/dev/null || true
-mkdir -p /tmp/kaizen-server-tests/lib/vitrin && cp lib/vitrin/*.json /tmp/kaizen-server-tests/lib/vitrin/
+mkdir -p /tmp/kaizen-server-tests/lib/vitrin /tmp/kaizen-server-tests/lib/i18n && cp lib/vitrin/*.json /tmp/kaizen-server-tests/lib/vitrin/ && mkdir -p /tmp/kaizen-server-tests/lib/vitrin/en && cp lib/vitrin/en/*.json /tmp/kaizen-server-tests/lib/vitrin/en/ && cp lib/i18n/*.json /tmp/kaizen-server-tests/lib/i18n/
 node tests/server.integration.cjs
 node tests/improvements.integration.cjs
 node tests/round5.integration.cjs

@@ -16,9 +16,29 @@
     // ai = MCP katmanlı sürüm (yapay zekâ bağlantısı Tanımlar'dan açılır, varsayılan kapalı); surec = yalnız süreç.
     "IVME_EDITION": "ai",
     // log = e-posta gönderilmez.
-    "EMAIL_PROVIDER": "log"
+    "EMAIL_PROVIDER": "log",
+    // Arayüzün varsayılan dili ve vitrin verisinin dili: tr | en. Kişi arayüz dilini TR/EN düğmesiyle değiştirebilir.
+    "IVME_LANG": "tr",
+    // Vitrinde giriş ekranında öteki dildeki demoya bağlantı (boşsa gösterilmez).
+    "IVME_ALT_DEMO_URL": "https://ivme-en.ysfdurak.com"
   },
   // Her gece 00:00 UTC (03:00 TR): vitrin verisini sıfırla (worker/index.ts → scheduled).
   "triggers": { "crons": ["0 0 * * *"] },
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  // İngilizce canlı demo (ivme-en.ysfdurak.com): aynı kod, ayrı Worker ve ayrı veritabanı, İngilizce örnek veri.
+  // Derleme: CLOUDFLARE_ENV=en npm run build → npx wrangler deploy (README → Yayın).
+  "env": {
+    "en": {
+      "name": "ivme-en",
+      "d1_databases": [{ "binding": "DB", "database_name": "ivme-en-db" }],
+      "vars": {
+        "IVME_VITRIN": "1",
+        "IVME_EDITION": "ai",
+        "EMAIL_PROVIDER": "log",
+        "IVME_LANG": "en",
+        "IVME_ALT_DEMO_URL": "https://ivme.ysfdurak.com"
+      },
+      "triggers": { "crons": ["0 0 * * *"] }
+    }
+  }
 }
