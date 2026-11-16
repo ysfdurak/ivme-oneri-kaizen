@@ -2111,5 +2111,20 @@
  "Zaman": "Time",
  "Zaman, kalite, iş güvenliği, ergonomi kazancı onaylanan öneri": "Proposals with approved time, quality, safety or ergonomics savings",
  "Zaman, maliyet, kalite veya güvenlik açısından beklediğin fayda. Tahmin yeterli, isteğe bağlı.": "The benefit you expect in time, cost, quality or safety. An estimate is enough; optional.",
- "Zaten uygulanıyor": "Already being implemented"
+ "Zaten uygulanıyor": "Already being implemented",
+ "Yeni hesaba tek kullanımlık geçici şifre verilir ve yalnız bir kez gösterilir. Şifresini unutan kişiye “Şifre sıfırla” ile yenisi verilir.": "New accounts get a one-time temporary password that is shown only once. Someone who forgets their password gets a new one with “Reset password”.",
+ "Şifre sıfırla": "Reset password",
+ "Şifreyi sıfırla": "Reset password",
+ "Geçici şifre": "Temporary password",
+ "için tek kullanımlık yeni bir geçici şifre oluşturulur. Eski şifresi geçersiz olur, açık oturumları kapanır ve ilk girişte kendi şifresini belirlemesi istenir.": "will get a new one-time temporary password. The old password stops working, open sessions are signed out and they are asked to set their own password at first sign-in.",
+ "şu bilgilerle giriş yapar. İlk girişte kendi şifresini belirlemesi istenir.": "signs in with these details. They are asked to set their own password at first sign-in.",
+ "Geçici şifre kopyalandı.": "Temporary password copied.",
+ "Bu şifre yalnızca şimdi gösterilir ve hiçbir yerde saklanmaz. Kişiye güvenli bir yoldan ilet; kaybolursa Kullanıcılar ekranından yeniden sıfırlayabilirsin.": "This password is shown only now and is not stored anywhere. Pass it on securely; if it gets lost, you can reset it again from the Users screen.",
+ "Yeni geçici şifre oluştur": "Create new temporary password",
+ "Yeni geçici şifre oluşturuldu.": "New temporary password created.",
+ "Kullanıcı kaydedildi.": "User saved.",
+ "Kendi şifreni sıfırlayamazsın; başka bir yönetici sıfırlayabilir.": "You can't reset your own password; another administrator can.",
+ "Pasif kullanıcının şifresi sıfırlanamaz.": "A passive user's password can't be reset.",
+ "{0} gündür bu aşamada": "{0} {0|day|days} in this stage",
+ "{0} gündür bekliyor": "{0} {0|day|days} waiting"
 }

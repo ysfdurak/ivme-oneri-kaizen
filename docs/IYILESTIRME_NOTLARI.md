@@ -77,7 +77,7 @@ Düzeltme: İlk incelemede "sol menü arka planı yarıda bitiyor" demiştim. Bu
 - Giriş hatalarında tek mesaj var: kullanıcı yok, şifre yanlış veya hesap kilitli ayırt edilemiyor.
 - `IVME_DEMO` ortam değişkeni: varsayılan açık (pilot aynı kalır). Şirket kurulumunda `IVME_DEMO=0` yapılınca giriş ekranındaki demo kutusu ve başlangıç şifresi kaybolur, kullanıcı adı alanı boş gelir.
 - Yönetici dışındaki roller kullanıcı listesinde kullanıcı adlarını görmez.
-- **Hâlâ açık:** Yeni kullanıcılar hâlâ `Kaizen123!` ile oluşturuluyor (ilk girişte değiştirme zorunlu). Şirket kurulumunda tek kullanımlık rastgele şifre veya şirket girişi (SSO) ile değiştirilmeli.
+- ~~**Hâlâ açık:** Yeni kullanıcılar `Kaizen123!` ile oluşturuluyor.~~ On üçüncü turda çözüldü: yeni hesaba tek kullanımlık rastgele şifre verilir, yönetici şifre sıfırlayabilir (belgenin sonunda). Şirket girişi (SSO) kurulum ortamına bağlı olarak ayrıca eklenebilir.
 
 ### 16–17. Erişilebilirlik
 - Düşük kontrastlı 7 renk koyulaştırıldı. axe taramasında ihlal 734'ten 0'a indi (giriş, ana sayfa, liste, detay, raporlar, form; masaüstü ve telefon).
@@ -107,8 +107,8 @@ Tarayıcıda uçtan uca denenenler: çalışan (telefon) taslak, büyük fotoğr
 
 ## Kapsam dışı kalanlar
 
-- **E-posta/SMS bildirimi:** Şirketin e-posta altyapısına (SMTP/Exchange) bağlı. Kurulum ortamı netleşince eklenebilir.
-- **Benzer öneri kontrolü:** Karar notlarındaki geliştirme kapsamında, ayrı iş.
+- **E-posta/SMS bildirimi:** ~~Şirketin e-posta altyapısına bağlı, sonra eklenebilir.~~ E-posta sonraki turda eklendi (aşağıda “E-posta bildirimleri”). SMS bilinçli olarak yapılmadı.
+- **Benzer öneri kontrolü:** ~~Ayrı iş.~~ Sonraki turda eklendi (aşağıda “Benzer öneri ve mükerrer işaretleme”).
 - **Veri tablolarına ayrıştırma:** Yukarıda açıklandı, şirket kurulumunun ön şartı.
 
 ---
@@ -469,3 +469,28 @@ Tanımlar → **Eski önerileri aktar** (yalnız sistem yöneticisi). Ayrıntıl
 - **İngilizce canlı demo:** aynı koddan ayrı Worker `ivme-en` ve ayrı veritabanı (`wrangler.jsonc → env.en`). Örnek veri `lib/vitrin/en/` altında; üretici aynı rastgele sırayı kullandığı için Türkçe demoyla aynı yapıda. Giriş ekranında öteki dildeki demoya bağlantı (`IVME_ALT_DEMO_URL`).
 - **Kapsam denetimi:** `scripts/i18n/anahtarlar.mjs` kaynak koddaki Türkçe metinleri bulur, sözlükte karşılığı olmayanları listeler. `tests/i18n.test.ts` bunu sıkı modda çalıştırır; ayrıca yer tutucu tutarlılığı, çoğul, JSX parçaları, geri çeviri, İngilizce e-posta ve İngilizce demo verisi sınanır.
 - Kontrol: 20 test grubu geçti. İngilizce demoda 6 rolün bütün sayfaları, öneri formu, detay sekmeleri ve işlem pencereleri tarayıcıda gezildi; Türkçe kalan arayüz metni yok. Giriş ve ana sayfa iki dilde masaüstü ve telefonda axe 0 ihlal.
+
+---
+
+# On üçüncü tur: tek kullanımlık geçici şifre ve şifre sıfırlama (16 Kasım 2026)
+
+**Sorun:** Kullanıcılar ekranından açılan her hesap aynı başlangıç şifresiyle (`Kaizen123!`) oluşuyordu. İlk girişte değiştirmek zorunlu olsa da, kişi ilk kez girene kadar bu şifreyi bilen herkes o hesaba girebilirdi. Şifresini unutan kişi için de yöneticinin yapabileceği bir şey yoktu.
+
+**Ne yapıldı:**
+- `lib/server.ts` → `tempPassword()`: karışmayan harf ve rakamlardan 6 karakter, tire ve 3 rakam (ör. `k7pm2x-418`). Excel ile kullanıcı aktarımı da artık aynı fonksiyonu kullanır.
+- Yeni kullanıcı (`action: "user"`, `userId` yoksa): şifre olarak geçici şifre yazılır (yalnız özeti saklanır), yanıtta `temp: { name, username, password }` döner.
+- Şifre sıfırlama (`action: "resetPassword"`, yalnız yönetici): yeni geçici şifre, `must_change=1`, hatalı giriş sayacı ve kilit sıfırlanır, kişinin açık oturumları silinir. Kendi şifreni ve pasif kullanıcının şifresini sıfırlayamazsın.
+- Arayüz (`app/page.tsx`): kayıttan sonra “Geçici şifre” penceresi açılır (kullanıcı adı, şifre, Kopyala). Pencere kapanınca şifre bir daha görünmez. Kullanıcılar tablosunda her aktif kişinin yanında “Şifre sıfırla” vardır.
+- Kullanıcı adı alanındaki `pattern` tarayıcının yeni düzenli ifade kuralına (`v` bayrağı) uymuyordu, hiç denetlemiyordu; `-` kaçışlandı.
+
+**Aynı turda düzeltilen küçük şeyler:**
+- İngilizce arayüzde anonim önerenin baş harfleri “Open” görünüyordu: “Anonim çalışan”ın baş harfleri “Aç” sözlükte “Open” diye çevriliyordu. `Avatar` artık baş harfleri arayüz dilindeki addan alır ve büyük harfe çevirir (AÇ / AE).
+- İngilizcede “1 days in this stage” gibi tekil-çoğul hataları: “{0} gündür bu aşamada” ve “{0} gündür bekliyor” kalıpları çoğul biçimiyle sözlüğe eklendi.
+- README'ye İngilizce demodan ekran görüntüleri eklendi (`docs/ekranlar/en/`).
+
+**Neden şifre ekranda gösteriliyor da e-postayla gönderilmiyor?** E-posta altyapısı her kurulumda açık olmayabilir ve şifrenin e-postada kalması ayrı bir risk. Yönetici şifreyi kişiye kendisi iletir; şifre sunucuda düz metin olarak hiç tutulmaz.
+
+**Demo notu:** Vitrin ve `IVME_DEMO` girişindeki hazır kişiler ilk kurulumda yine `Kaizen123!` ile oluşur (giriş ekranında yazıyor). Şirket kurulumunda `IVME_DEMO=0` yapılır ve ilk yönetici dışında herkes Kullanıcılar ekranından ya da Excel aktarımıyla açılır.
+
+**Test:** `tests/round13.integration.cjs`: yeni kullanıcıda geçici şifre biçimi, eski sabit şifreyle girilememesi, ilk girişte değiştirme zorunluluğu, yönetici olmayanın sıfırlayamaması, sıfırlamada eski şifrenin geçersizleşmesi ve oturumların kapanması, kendi şifresini sıfırlayamama.
+

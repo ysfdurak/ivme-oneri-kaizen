@@ -15,6 +15,13 @@ export async function hash(s: string) {
     .map((x) => x.toString(16).padStart(2, "0"))
     .join("");
 }
+/** Tek kullanımlık geçici şifre: karışmayan harf ve rakamlardan 6 karakter + tire + 3 rakam (ör. "k7pm2x-418").
+ * Kişi ilk girişte kendi şifresini belirlemek zorundadır (must_change=1). Şifre yalnızca bir kez, yöneticiye gösterilir. */
+export function tempPassword() {
+  const chars = "abcdefghjkmnpqrstuvwxyz23456789";
+  const head = Array.from(crypto.getRandomValues(new Uint8Array(6)), (x) => chars[x % chars.length]).join("");
+  return head + "-" + (100 + (crypto.getRandomValues(new Uint16Array(1))[0] % 900));
+}
 export async function password(s: string, salt = crypto.randomUUID()) {
   const key = await crypto.subtle.importKey(
     "raw",

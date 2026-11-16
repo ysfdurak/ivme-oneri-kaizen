@@ -4,6 +4,7 @@ import {
   json,
   users,
   password,
+  tempPassword,
   sameOrigin,
   edition,
 } from "../../../lib/server";
@@ -48,6 +49,23 @@ export async function POST(req: Request) {
         },
         400,
       );
+    if (b.action === "resetPassword") {
+      // Yönetici, şifresini unutan kişiye yeni geçici şifre verir; kişi ilk girişte yenisini belirler, kilit kalkar.
+      if (u.role !== "admin") return json({ error: "Yetkiniz yok." }, 403);
+      const t = us.find((x) => x.id === b.userId);
+      if (!t) return json({ error: "Kullanıcı bulunamadı." }, 404);
+      if (t.id === u.id)
+        return json({ error: "Kendi şifreni sıfırlayamazsın; başka bir yönetici sıfırlayabilir." }, 400);
+      if (!t.active) return json({ error: "Pasif kullanıcının şifresi sıfırlanamaz." }, 400);
+      const temp = tempPassword();
+      await db().batch([
+        db()
+          .prepare("UPDATE users SET password=?,must_change=1,failures=0,locked_until=0 WHERE id=?")
+          .bind(await password(temp), t.id),
+        db().prepare("DELETE FROM sessions WHERE user_id=?").bind(t.id),
+      ]);
+      return json({ ok: true, temp: { name: t.name, username: t.username, password: temp } });
+    }
     if (b.action === "user") {
       if (u.role !== "admin") return json({ error: "Yetkiniz yok." }, 403);
       if (
@@ -135,6 +153,8 @@ export async function POST(req: Request) {
           )
           .run();
       } else {
+        // Yeni hesap: tek kullanımlık geçici şifre. Yalnız bu yanıtta yöneticiye döner, hiçbir yerde saklanmaz (yalnız özeti).
+        const temp = tempPassword();
         await db()
           .prepare(
             "INSERT INTO users (id,username,name,department,directorate,role,manager,password,must_change,active,failures,locked_until,email) VALUES (?,?,?,?,?,?,?,?,1,1,0,0,?)",
@@ -147,10 +167,11 @@ export async function POST(req: Request) {
             b.directorate,
             b.role,
             b.manager || "",
-            await password("Kaizen123!"),
+            await password(temp),
             b.email || null,
           )
           .run();
+        return json({ ok: true, temp: { name: b.name, username: b.username, password: temp } });
       }
       return json({ ok: true });
     }
@@ -370,13 +391,7 @@ async function importUsers(b: any, u: any, us: any[]) {
           ),
       );
     else {
-      const temp =
-        Array.from(
-          crypto.getRandomValues(new Uint8Array(6)),
-          (x) => "abcdefghjkmnpqrstuvwxyz23456789"[x % 31],
-        ).join("") +
-        "-" +
-        (100 + (crypto.getRandomValues(new Uint8Array(1))[0] % 900));
+      const temp = tempPassword();
       created.push({ name: p.name, username: p.username, password: temp });
       stmts.push(
         db()

@@ -47,7 +47,7 @@ Kâğıt formlarda ya da e-posta zincirlerinde yürüyen öneri sistemlerinde ö
 - **Süreç kuralları:** `lib/workflow.ts`. Sunucudan ve arayüzden bağımsız, saf bir komut işleyici (`applyCommand`). Bütün yetki ve durum geçişleri burada tanımlı ve test ediliyor.
 - **Veri:** kullanıcılar ve oturumlar ayrı tablolarda. Öneri verisi sürümlü tek bir çalışma alanı kaydında tutulur; kayıt bazlı eşzamanlılık denetimi vardır.
 - **Bildirim:** önce giden kutusuna yazılır, sonra gönderilir. Microsoft Graph (Outlook) ya da webhook (Power Automate, n8n…) desteklenir.
-- **Güvenlik:** PBKDF2 ile saklanan şifreler, HttpOnly oturum çerezi, origin denetimi, 5 hatalı girişte geçici kilit, rol bazlı görünürlük, anonim önerenin kimliğinin gizlenmesi.
+- **Güvenlik:** PBKDF2 ile saklanan şifreler, yeni hesaplara tek kullanımlık geçici şifre ve yöneticinin şifre sıfırlaması, HttpOnly oturum çerezi, origin denetimi, 5 hatalı girişte geçici kilit, rol bazlı görünürlük, anonim önerenin kimliğinin gizlenmesi.
 
 ```
 app/            ekranlar ve API uçları (app/api/*/route.ts)
@@ -67,7 +67,7 @@ pnpm install
 npm run build
 npm start                                   # http://localhost:8787
 npm start -- --var IVME_VITRIN:0            # vitrin yerine normal giriş ekranı
-./scripts/test.sh                           # 20 test grubu
+./scripts/test.sh                           # 21 test grubu
 ```
 
 Büyük test verisi üretmek için `scripts/test-verisi/README.md` dosyasına bakın.
@@ -85,7 +85,7 @@ Bu sürüm bütün çalışma alanını tek bir kayıtta tuttuğu için D1'in 2 
 
 ## Belgeler
 
-- [docs/IYILESTIRME_NOTLARI.md](docs/IYILESTIRME_NOTLARI.md): her özelliğin neden ve nasıl eklendiği (13 tur)
+- [docs/IYILESTIRME_NOTLARI.md](docs/IYILESTIRME_NOTLARI.md): her özelliğin neden ve nasıl eklendiği, tur tur
 - [docs/AKTARIM_REHBERI.md](docs/AKTARIM_REHBERI.md): eski önerilerin Excel ile aktarılması ve geri alınması
 - [docs/MCP_REHBERI.md](docs/MCP_REHBERI.md): yapay zekâ katmanı, kurulum ve güvenlik
 - [docs/DIL_DESTEGI.md](docs/DIL_DESTEGI.md): Türkçe / English arayüz, yeni metin ekleme, İngilizce demo
@@ -94,6 +94,16 @@ Bu sürüm bütün çalışma alanını tek bir kayıtta tuttuğu için D1'in 2 
 ## English
 
 İvme is an employee suggestion and kaizen management system. One workflow covers each idea from submission through review, action, savings, scoring and reward, with role-based work queues, stage targets and overdue alerts, a report builder, participation statistics, e-mail notifications, Excel migration and an optional read-only MCP layer for in-house AI. The interface, e-mails, reports and exports are available in Turkish and English (TR/EN switch; installation default via `IVME_LANG`). English live demo with English sample data: [ivme-en.ysfdurak.com](https://ivme-en.ysfdurak.com). Pick a role to sign in; sample data resets nightly.
+
+![Sign-in: pick a role for the live demo](docs/ekranlar/en/01-sign-in.png)
+
+| My work centre | Status board |
+|---|---|
+| ![My work centre](docs/ekranlar/en/02-work-centre.png) | ![Status board](docs/ekranlar/en/03-status-board.png) |
+| **Proposal detail** | **Report builder** |
+| ![Proposal detail](docs/ekranlar/en/05-proposal-detail.png) | ![Report builder](docs/ekranlar/en/04-report-builder.png) |
+
+Security: passwords are stored with PBKDF2; new accounts get a one-time temporary password shown once to the administrator, who can also reset a forgotten password.
 
 ## Lisans
 
