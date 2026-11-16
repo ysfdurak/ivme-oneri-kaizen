@@ -42,6 +42,7 @@ Sayı ve tarih biçimi `intlLocale()` ile dile göre seçilir (`tr-TR` / `en-GB`
 `tests/i18n.test.ts` bu kontrolü `--strict` ile çalıştırır. Çevrilmemiş metin kalırsa test başarısız olur.
 
 **Dikkat edilecek yerler:**
+- Para tutarı başlıklarında simge olarak her zaman "₺" yaz ("Yıllık ₺"). Bu bir yer tutucudur: ekrana çıkarken Tanımlar'da seçilen para birimiyle değişir (`withCurrency`).
 - Bir değeri hem ekranda gösterip hem de karşılaştırmada kullanıyorsan karşılaştırma Türkçe kodla yapılır. Çeviri yalnız ekrana çıkarken uygulanır, kodu etkilemez.
 - `value` niteliği çevrilmez. Girdi kutusunda görünen bir sabiti çevirmek gerekirse `translate(...)` açıkça çağrılır (ör. Tanımlar'daki kilitli maddeler).
 - Yan yana iki değişken (`"Satır " + no + ad`) belirsizdir. Bu durumda metin parça parça çevrilir.

@@ -2126,5 +2126,15 @@
  "Kendi şifreni sıfırlayamazsın; başka bir yönetici sıfırlayabilir.": "You can't reset your own password; another administrator can.",
  "Pasif kullanıcının şifresi sıfırlanamaz.": "A passive user's password can't be reset.",
  "{0} gündür bu aşamada": "{0} {0|day|days} in this stage",
- "{0} gündür bekliyor": "{0} {0|day|days} waiting"
+ "{0} gündür bekliyor": "{0} {0|day|days} waiting",
+ "Para birimi": "Currency",
+ "Para birimi güncellendi.": "Currency updated.",
+ "Kazanç, maliyet ve ödül tutarları bu simgeyle gösterilir; ekranlar, raporlar, e-postalar ve dışa aktarımlar dahil. Tutarlar çevrilmez, yalnız simge değişir.": "Savings, cost and reward amounts are shown with this symbol, including screens, reports, e-mails and exports. Amounts are not converted; only the symbol changes.",
+ "Türk lirası (TRY)": "Turkish lira (TRY)",
+ "Avro (EUR)": "Euro (EUR)",
+ "ABD doları (USD)": "US dollar (USD)",
+ "İngiliz sterlini (GBP)": "British pound (GBP)",
+ "Geçerli bir para birimi seçin.": "Choose a valid currency.",
+ "Para birimi {0} olarak ayarlandı.": "Currency set to {0}.",
+ "olarak ayarlandı.": "set."
 }

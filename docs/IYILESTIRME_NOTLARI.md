@@ -494,3 +494,18 @@ Tanımlar → **Eski önerileri aktar** (yalnız sistem yöneticisi). Ayrıntıl
 
 **Test:** `tests/round13.integration.cjs`: yeni kullanıcıda geçici şifre biçimi, eski sabit şifreyle girilememesi, ilk girişte değiştirme zorunluluğu, yönetici olmayanın sıfırlayamaması, sıfırlamada eski şifrenin geçersizleşmesi ve oturumların kapanması, kendi şifresini sıfırlayamama.
 
+---
+
+# On dördüncü tur: para birimi (16 Kasım 2026)
+
+**Sorun:** Tutarlar her yerde Türk lirası (₺) olarak sabitti; İngilizce demoda ve yurt dışındaki bir kurulumda yanlış görünüyordu.
+
+**Ne yapıldı:**
+- Tanımlar → **Para birimi**: Türk lirası (varsayılan), avro, ABD doları, İngiliz sterlini. Yalnız sistem yöneticisi değiştirir (`currencySettings`, `lib/workflow.ts`), kayıt `settings.currency`'de durur. Tutarlar çevrilmez, yalnız simge değişir.
+- `lib/model.ts`: `currency()`, `setCurrency()`, `withCurrency()`; `money()` seçili simgeyi kullanır. Sunucuda `migrateState` her okumada simgeyi ayarlar (e-posta, MCP, dışa aktarım); tarayıcıda ana bileşen her çizimde ayarlar.
+- **"₺" bir yer tutucudur.** Kodda ve sözlükte başlıklar yine "Yıllık ₺", "Uygulama maliyeti (₺)" diye yazılır. `app/i18n-jsx.ts` metni çevirdikten sonra "₺"yi seçili simgeyle değiştirir; Türkçe arayüzde de çalışır. Bu yüzden sözlükte yeni anahtar gerekmez. Ekranda gerçekten "₺" görünmesi gereken bir etiket yazılmaz (para birimi listesinde bu yüzden TRY/EUR/USD/GBP kodları var).
+- Ödül tutarı metni (`rewardText`) ve tablo biçimlendiricileri (`report-builder.tsx`, `rewards-page.tsx`) simgeyi `currency()`'den alır. Excel aktarımı tutarlardan ₺, €, $ ve £ işaretlerini temizler.
+- İngilizce demo verisi doları kullanır (`scripts/test-verisi/uret.ts` İngilizce üretimde `currency: "$"` yazar); Türkçe demo ve yeni kurulumlar Türk lirasıyla başlar.
+
+**Test:** `tests/round14.test.ts`: varsayılan ₺, yalnız yöneticinin değiştirebilmesi, geçersiz simgenin reddi, tutar/ödül/başlık metinlerinde yeni simge, İngilizce başlıklarda simge.
+

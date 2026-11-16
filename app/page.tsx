@@ -72,6 +72,7 @@ import {
   ANON,
   supportWaitText,
   age,
+  setCurrency,
 } from "../lib/model";
 import DashboardPage from "./dashboard-page";
 import LanguageSwitch from "./language-switch";
@@ -414,6 +415,8 @@ export default function App() {
     [busy, setBusy] = useState(false),
     [toast, setToast] = useState(""),
     [error, setError] = useState("");
+  // Kurumun para birimi (Tanımlar → Para birimi): tutarlar ve "₺" yazan başlıklar bu simgeyle gösterilir.
+  setCurrency(state?.settings?.currency);
   const [formStep, setFormStep] = useState(1),
     [queueScope, setQueueScope] = useState("team");
   const [login, setLogin] = useState({ username: "admin", password: "" }),

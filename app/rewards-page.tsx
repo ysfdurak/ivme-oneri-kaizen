@@ -6,7 +6,7 @@ import { intlLocale, translate } from "../lib/i18n";
 import React, { useMemo, useState } from "react";
 import { Download, Gift } from "lucide-react";
 import type { Proposal, User } from "../lib/model";
-import { gainFigures } from "../lib/model";
+import { currency, gainFigures } from "../lib/model";
 import { REWARD_STATUSES, Reward, rewardText } from "../lib/rewards";
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
 };
 
 const money = (n: number) =>
-  n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 }) + " ₺";
+  n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 }) + " " + currency();
 const thisMonth = () =>
   new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 7);
 

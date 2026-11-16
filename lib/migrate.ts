@@ -3,7 +3,7 @@ import { applyTargetDays } from "./definitions";
 // - "Operasyon değerlendirmesi" aşaması "Bölüm değerlendirmesi" oldu (Kasım 2026, adlandırma kararı).
 // - Organizasyon tanımları (departman → müdürlük) yoksa kullanıcılardan çıkarılır.
 // - Lokasyon listesi yoksa boş başlatılır.
-import type { State } from "./model";
+import { setCurrency, type State } from "./model";
 const RENAMES: Record<string, string> = {
   "Operasyon değerlendirmesi": "Bölüm değerlendirmesi",
 };
@@ -12,6 +12,8 @@ export function migrateState(
   s: State,
   users: { department: string; directorate: string; role?: string }[] = [],
 ) {
+  // Sunucuda e-posta, MCP ve dışa aktarımdaki tutarlar kurumun para birimiyle yazılsın.
+  setCurrency(s.settings?.currency);
   for (const p of s.proposals) {
     p.status = ren(p.status)!;
     p.revisionTarget = ren(p.revisionTarget);

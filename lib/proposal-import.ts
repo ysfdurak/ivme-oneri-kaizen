@@ -135,7 +135,7 @@ export function parseDate(v: any): string | null {
 export function parseNum(v: any): number | null {
   if (typeof v === "number") return Number.isFinite(v) ? v : null;
   let s = String(v ?? "")
-    .replace(/[₺\s]/g, "")
+    .replace(/[₺€$£\s]/g, "")
     .trim();
   if (!s) return null;
   // Türkçe yazım: nokta binlik, virgül ondalık ("48.000", "12.500,50"). "12.5" gibi tek ondalık nokta korunur.

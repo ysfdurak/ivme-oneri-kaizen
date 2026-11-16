@@ -13,6 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type { Proposal, User } from "../lib/model";
+import { currency } from "../lib/model";
 import {
   DATE_BASES,
   DEFAULT_CONFIG,
@@ -39,7 +40,7 @@ type Props = {
 
 const fmt = (n: number, money?: boolean) =>
   money
-    ? n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 }) + " ₺"
+    ? n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 }) + " " + currency()
     : n.toLocaleString(intlLocale(), { maximumFractionDigits: 1 });
 
 function csv(name: string, rows: (string | number)[][]) {
