@@ -369,11 +369,14 @@ function Badge({ status }: { status: string }) {
 function Avatar({ name, small = false }: { name: string; small?: boolean }) {
   return (
     <span className={"avatar " + (small ? "small" : "")}>
-      {name
+      {/* Baş harfler arayüz dilindeki addan alınır ("Anonim çalışan" → AÇ, "Anonymous employee" → AE);
+          büyük harfe çevrilir ki sözlükteki kısa kelimelerle (ör. "Aç") karışıp çevrilmesin. */}
+      {translate(name)
         .split(" ")
         .map((x) => x[0])
         .slice(0, 2)
-        .join("")}
+        .join("")
+        .toLocaleUpperCase(intlLocale())}
     </span>
   );
 }
@@ -3091,8 +3094,9 @@ export default function App() {
                   <div>
                     <b>İlk girişte şifre değişikliği zorunludur.</b>
                     <span>
-                      Yeni hesapların başlangıç şifresi: Kaizen123! · Her
-                      kullanıcı kendi şifresini belirler.
+                      Yeni hesaba tek kullanımlık geçici şifre verilir ve
+                      yalnız bir kez gösterilir. Şifresini unutan kişiye
+                      “Şifre sıfırla” ile yenisi verilir.
                     </span>
                   </div>
                 </div>
@@ -3229,6 +3233,19 @@ export default function App() {
                                   >
                                     Düzenle
                                   </button>
+                                  {u.active && u.id !== user.id && (
+                                    <button
+                                      className="text-button"
+                                      onClick={() =>
+                                        open("resetPass", {
+                                          userId: u.id,
+                                          name: u.name,
+                                        })
+                                      }
+                                    >
+                                      Şifre sıfırla
+                                    </button>
+                                  )}
                                   {total > 0 && (
                                     <button
                                       className="text-button"
@@ -5061,6 +5078,8 @@ export default function App() {
                       : "Aktarılan kayıtları sil",
                     duplicate: "Mükerrer olarak işaretle",
                     prefs: "Bildirim tercihim",
+                    resetPass: "Şifreyi sıfırla",
+                    tempPass: "Geçici şifre",
                     reject: "Öneriyi reddet",
                     revision: "Revizyon iste",
                     forward: "Öneriyi yönlendir",
@@ -5493,6 +5512,48 @@ export default function App() {
                       />
                     </Field>
                   </>
+                )}
+                {modal.type === "resetPass" && (
+                  <p>
+                    <b>{draft.name}</b> için tek kullanımlık yeni bir geçici
+                    şifre oluşturulur. Eski şifresi geçersiz olur, açık
+                    oturumları kapanır ve ilk girişte kendi şifresini
+                    belirlemesi istenir.
+                  </p>
+                )}
+                {modal.type === "tempPass" && (
+                  <div className="temp-pass">
+                    <p>
+                      <b>{draft.name}</b> şu bilgilerle giriş yapar. İlk
+                      girişte kendi şifresini belirlemesi istenir.
+                    </p>
+                    <dl>
+                      <dt>Kullanıcı adı</dt>
+                      <dd>
+                        <code>{draft.username}</code>
+                      </dd>
+                      <dt>Geçici şifre</dt>
+                      <dd>
+                        <code className="temp-pass-code">{draft.password}</code>
+                        <button
+                          type="button"
+                          className="text-button"
+                          onClick={() =>
+                            navigator.clipboard
+                              ?.writeText(draft.password)
+                              .then(() => alert("Geçici şifre kopyalandı."))
+                          }
+                        >
+                          Kopyala
+                        </button>
+                      </dd>
+                    </dl>
+                    <p className="muted">
+                      Bu şifre yalnızca şimdi gösterilir ve hiçbir yerde
+                      saklanmaz. Kişiye güvenli bir yoldan ilet; kaybolursa
+                      Kullanıcılar ekranından yeniden sıfırlayabilirsin.
+                    </p>
+                  </div>
                 )}
                 {modal.type === "prefs" && (
                   <fieldset className="choice-list">
@@ -6051,7 +6112,7 @@ export default function App() {
                       <Field label="Kullanıcı adı *">
                         <input
                           required
-                          pattern="[a-z0-9._-]{3,40}"
+                          pattern="[a-z0-9._\-]{3,40}"
                           value={draft.username}
                           onChange={(e) =>
                             setDraft({ ...draft, username: e.target.value })
@@ -6311,9 +6372,9 @@ export default function App() {
                     setError("");
                   }}
                 >
-                  {modal.type === "process" ? "Kapat" : "Vazgeç"}
+                  {modal.type === "process" || modal.type === "tempPass" ? "Kapat" : "Vazgeç"}
                 </button>
-                {modal.type !== "process" && (
+                {modal.type !== "process" && modal.type !== "tempPass" && (
                   <button
                     disabled={busy}
                     className={
@@ -6342,6 +6403,7 @@ export default function App() {
                         deleteImported: "Kalıcı olarak sil",
                         duplicate: "Mükerrer olarak işaretle",
                         prefs: "Kaydet",
+                        resetPass: "Yeni geçici şifre oluştur",
                         reject: "Reddet",
                         revision: "Revizyon iste",
                         forward: "Yönlendir",
@@ -6598,6 +6660,7 @@ export default function App() {
   async function submitModal(e: React.FormEvent) {
     e.preventDefault();
     if (modal.type === "process") return;
+    if (modal.type === "tempPass") return setModal(null);
     if (modal.type === "prefs") {
       const r = await command(
         { action: "myPrefs", notify: draft.notify },
@@ -6677,6 +6740,8 @@ export default function App() {
       duplicate:
         "Öneri mükerrer olarak işaretlendi ve önceki öneriye bağlandı.",
       prefs: "Bildirim tercihin kaydedildi.",
+      resetPass: "Yeni geçici şifre oluşturuldu.",
+      user: "Kullanıcı kaydedildi.",
       reject: "Öneri reddedildi. Öneren kişi gerekçeni görebilir.",
       revision: "Revizyon istendi. Öneri sahibine iletildi.",
       forward: "Öneri yönlendirildi.",
@@ -6689,9 +6754,10 @@ export default function App() {
       reassign: "reassignUser",
       undoTransfer: "undoTransfer",
       prefs: "myPrefs",
+      resetPass: "resetPassword",
     };
     const action = settingsAction[modal.type] || modal.type;
-    const result = await command(
+    const result: any = await command(
       {
         ...draft,
         action,
@@ -6720,6 +6786,8 @@ export default function App() {
               " matris görevi. Devir geçmişinden geri alabilirsin."
           : messages[modal.type],
     );
+    // Yeni kullanıcı ya da şifre sıfırlama: geçici şifre yalnız bu yanıtta gelir, bir kez gösterilir.
+    if (result?.temp) open("tempPass", result.temp);
     if (result && modal.type === "operation")
       alert(
         "Bölüm eklendi. Varsayılan atamalar yöneticiye yapıldı; matrisi düzenleyebilirsin.",

@@ -26,3 +26,4 @@ node tests/round5.integration.cjs
 node tests/round6.integration.cjs
 node tests/mcp.integration.cjs
 node tests/round12.integration.cjs
+node tests/round13.integration.cjs
