@@ -74,7 +74,7 @@ Büyük test verisi üretmek için `scripts/test-verisi/README.md` dosyasına ba
 
 ## Yayın
 
-`wrangler.jsonc` Cloudflare Workers ayarlarını içerir. Depo Cloudflare Workers Builds'e bağlıdır; `main` dalına her gönderimde derlenir ve yayınlanır. İngilizce demo aynı depodan ayrı bir Worker (`ivme-en`) olarak derlenir: `CLOUDFLARE_ENV=en npm run build` (kurulum adımları: [docs/DIL_DESTEGI.md](docs/DIL_DESTEGI.md)). D1 veritabanı ilk yayında otomatik oluşturulur, tablolar uygulamanın ilk açılışında kurulur.
+`wrangler.jsonc` Cloudflare Workers ayarlarını içerir. Depo Cloudflare Workers Builds'e bağlıdır; `main` dalına her gönderimde derlenir ve yayınlanır. İngilizce demo aynı depodan ayrı bir Worker (`ivme-en`) olarak derlenir: `CLOUDFLARE_ENV=en npm run build` (kurulum adımları: [docs/DIL_DESTEGI.md](docs/DIL_DESTEGI.md)). Cloudflare panelinde en sağlam yol, `ivme-en` Worker'ının **Settings → Build → Variables and secrets** bölümüne `CLOUDFLARE_ENV = en` derleme değişkenini eklemek ve derleme komutunu `npm run build` bırakmaktır. Derleme günlüğünde `ivme-en-db` ve `IVME_LANG: "en"` görünmüyorsa Worker Türkçe ayarla yayınlanmıştır. D1 veritabanı ilk yayında otomatik oluşturulur, tablolar uygulamanın ilk açılışında kurulur.
 
 **Şirket kurulumu için:**
 - `IVME_VITRIN` `0` yapılır.
