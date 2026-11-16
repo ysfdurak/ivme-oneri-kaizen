@@ -132,6 +132,8 @@ export type State = {
   settings?: {
     disabledReports?: string[];
     orgName?: string;
+    /** Para birimi simgesi (CURRENCIES); yoksa ₺. */
+    currency?: string;
     /** Öneri lokasyonları (Tanımlar sayfasından yönetilir). */
     locations?: string[];
     /** Benzer öneri aramasında kullanılan eş anlamlı grupları (ör. ["palet", "yük"]). */
@@ -176,7 +178,23 @@ export type ImportBatch = {
 };
 export const fmt = (v: number) =>
   new Intl.NumberFormat(intlLocale(), { maximumFractionDigits: 0 }).format(v || 0);
-export const money = (v: number) => "₺" + fmt(v);
+/** Para birimi simgesi: Tanımlar → Para birimi (settings.currency). Varsayılan Türk lirası (₺).
+ * Arayüz ve kod metinlerinde "₺" yer tutucu olarak yazılır; ekrana çıkarken seçili simgeyle değişir (app/i18n-jsx.ts → withCurrency). */
+// Etiketlerde simge değil kod yazılır: "₺" ekranda seçili simgeyle değiştirildiği için etikette kalamaz.
+export const CURRENCIES = [
+  ["₺", "Türk lirası (TRY)"],
+  ["€", "Avro (EUR)"],
+  ["$", "ABD doları (USD)"],
+  ["£", "İngiliz sterlini (GBP)"],
+] as const;
+let CURRENCY = "₺";
+export const currency = () => CURRENCY;
+export function setCurrency(c?: string | null) {
+  CURRENCY = CURRENCIES.some(([x]) => x === c) ? (c as string) : "₺";
+}
+/** Metindeki "₺" yer tutucusunu seçili para birimiyle değiştirir. */
+export const withCurrency = (s: string) => (CURRENCY === "₺" || !s.includes("₺") ? s : s.replace(/₺/g, CURRENCY));
+export const money = (v: number) => CURRENCY + fmt(v);
 export const date = (v: string) =>
   v ? new Date(v).toLocaleDateString(intlLocale()) : "—";
 export const waiting = (p: Proposal) =>

@@ -26,7 +26,7 @@ Kâğıt formlarda ya da e-posta zincirlerinde yürüyen öneri sistemlerinde ö
 - **Ödül:** puanlamadan sonra kurallara göre ödül önerisi otomatik oluşur (ör. 0,5 maaş ya da sabit tutar). İK onaylar ve ödendi olarak işaretler. Maaş bilgisi tutulmaz.
 - **Raporlar:** durum panosu, katılım istatistikleri (hiç öneri vermeyen, 5 ve üzeri öneri veren, en çok öneri veren ilk N kişi) ve yıl/ay filtreli, istenen ölçüyle rapor oluşturucu.
 - **Katılımı artıranlar:** anonim öneri, kampanyalar, önce/sonra fotoğrafı, benzer öneri uyarısı, tanınma ekranı, QR ile doğrudan öneri.
-- **Kuruma uyarlama:** öneri sınıfları, ret ve uygulanamama nedenleri, kazanç türleri, puan kriterleri, hedef süreler ve bildirim kuralları Tanımlar ekranından yönetilir.
+- **Kuruma uyarlama:** öneri sınıfları, ret ve uygulanamama nedenleri, kazanç türleri, puan kriterleri, hedef süreler, bildirim kuralları ve para birimi (varsayılan Türk lirası; avro, dolar, sterlin) Tanımlar ekranından yönetilir.
 - **Geçiş:** kullanıcılar ve eski öneriler Excel ile aktarılır. Aktarım önce kontrol edilir; sonradan geri alınabilir.
 - **Erişilebilirlik:** klavye ile kullanım ve ekran okuyucu etiketleri. Ekranlar axe ile taranmıştır.
 - **Türkçe / English:** arayüz, e-postalar, raporlar ve dışa aktarımlar iki dilde. Kişi dilini TR/EN düğmesiyle seçer; kurulumun varsayılanı `IVME_LANG`. Ayrıntı: [docs/DIL_DESTEGI.md](docs/DIL_DESTEGI.md).
@@ -67,7 +67,7 @@ pnpm install
 npm run build
 npm start                                   # http://localhost:8787
 npm start -- --var IVME_VITRIN:0            # vitrin yerine normal giriş ekranı
-./scripts/test.sh                           # 21 test grubu
+./scripts/test.sh                           # 22 test grubu
 ```
 
 Büyük test verisi üretmek için `scripts/test-verisi/README.md` dosyasına bakın.

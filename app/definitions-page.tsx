@@ -13,7 +13,7 @@ import {
   Settings2,
   Trash2,
 } from "lucide-react";
-import { OrgDefinitions, State, User } from "../lib/model";
+import { CURRENCIES, OrgDefinitions, State, User } from "../lib/model";
 import NotifySettings from "./notify-settings";
 import QrSheet from "./qr-sheet";
 import CampaignSettings from "./campaign-settings";
@@ -547,6 +547,36 @@ export default function DefinitionsPage({
           </label>
         </section>
       )}
+
+      <section className="panel def-panel" aria-labelledby="currency-setting">
+        <div className="section-heading">
+          <h2 id="currency-setting">Para birimi</h2>
+        </div>
+        <label className="toggle-row">
+          <select
+            value={state.settings?.currency || "₺"}
+            disabled={busy}
+            onChange={(e) =>
+              command(
+                { action: "currencySettings", currency: e.target.value },
+                false,
+                "Para birimi güncellendi.",
+              )
+            }
+          >
+            {CURRENCIES.map(([c, label]) => (
+              <option key={c} value={c}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <span>
+            Kazanç, maliyet ve ödül tutarları bu simgeyle gösterilir; ekranlar,
+            raporlar, e-postalar ve dışa aktarımlar dahil. Tutarlar çevrilmez,
+            yalnız simge değişir.
+          </span>
+        </label>
+      </section>
 
       <section className="panel def-panel" aria-labelledby="rec-setting">
         <div className="section-heading">

@@ -15,6 +15,7 @@ import {
   activeCampaigns,
   NOT_IMPLEMENTED,
   NOT_IMPLEMENTED_REASONS,
+  CURRENCIES,
 } from "./model";
 import { REPORT_IDS, REPORTS } from "./dashboard";
 import {
@@ -755,6 +756,23 @@ export function applyCommand(s: State, b: any, u: User, us: User[]) {
       "E-posta bildirim kuralları güncellendi" +
         (disabled.length ? " · kapalı: " + disabled.join(", ") : "") +
         ".",
+    );
+    return;
+  }
+  if (b.action === "currencySettings") {
+    assert(
+      u.role === "admin",
+      "Bu ayarı yalnızca sistem yöneticisi değiştirebilir.",
+    );
+    assert(
+      CURRENCIES.some(([c]) => c === b.currency),
+      "Geçerli bir para birimi seçin.",
+    );
+    s.settings = { ...(s.settings || {}), currency: b.currency };
+    audit(
+      "Para birimi " +
+        CURRENCIES.find(([c]) => c === b.currency)![1] +
+        " olarak ayarlandı.",
     );
     return;
   }

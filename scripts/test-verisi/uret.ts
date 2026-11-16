@@ -752,6 +752,8 @@ const d = (days: number) =>
   new Date(t0 + days * 86400000).toISOString().slice(0, 10);
 s.settings = {
   ...(s.settings || {}),
+  // İngilizce demo şirketi dolar kullanır; Türkçe kurulumda varsayılan Türk lirası (alan yok = ₺).
+  ...(EN ? { currency: "$" } : {}),
   campaigns: [
     {
       id: "k-isg-ayi",

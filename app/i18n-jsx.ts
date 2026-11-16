@@ -3,7 +3,14 @@
 // Türkçe seçiliyken hiçbir şey değiştirmez. Değerler (value, key, id…) hiç çevrilmez; yalnız görünen metin.
 // @ts-ignore: gerçek çalışma zamanı (eklenti bu dosyanın kendi içe aktarmasını yeniden yönlendirmez)
 import * as real from "react/jsx-runtime";
-import { getLocale, translate, translateParts } from "../lib/i18n";
+import { getLocale, translate as tr0, translateParts as tp0 } from "../lib/i18n";
+import { currency, withCurrency } from "../lib/model";
+// "₺" yer tutucusu çeviriden sonra kurumun para birimiyle değişir (Tanımlar → Para birimi).
+const translate = (s: string) => withCurrency(tr0(s));
+const translateParts = (p: string[]) => {
+  const o = tp0(p);
+  return o === null ? null : withCurrency(o);
+};
 
 const ATTRS = ["title", "placeholder", "aria-label", "aria-description", "aria-valuetext", "alt"];
 // İçeriği kod ya da kullanıcı girdisi olan öğelerin içeriği çevrilmez (başlık, yer tutucu gibi nitelikleri çevrilir).
@@ -31,7 +38,7 @@ function children(c: any): any {
 }
 
 function wrap(type: any, props: any) {
-  if (getLocale() === "tr" || !props) return props;
+  if (!props || (getLocale() === "tr" && currency() === "₺")) return props;
   const intrinsic = typeof type === "string";
   let next = props;
   if ("children" in props && !(intrinsic && SKIP.has(type))) {
