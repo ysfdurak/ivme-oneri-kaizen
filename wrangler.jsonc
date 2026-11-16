@@ -20,7 +20,9 @@
     // Arayüzün varsayılan dili ve vitrin verisinin dili: tr | en. Kişi arayüz dilini TR/EN düğmesiyle değiştirebilir.
     "IVME_LANG": "tr",
     // Vitrinde giriş ekranında öteki dildeki demoya bağlantı (boşsa gösterilmez).
-    "IVME_ALT_DEMO_URL": "https://ivme-en.ysfdurak.com"
+    "IVME_ALT_DEMO_URL": "https://ivme-en.ysfdurak.com",
+    // Vitrin demosunun kendi adresi: arama ve paylaşım etiketleri (canonical, hreflang, Open Graph) için. Şirket kurulumunda boş bırakılır.
+    "IVME_PUBLIC_URL": "https://ivme.ysfdurak.com"
   },
   // Her gece 00:00 UTC (03:00 TR): vitrin verisini sıfırla (worker/index.ts → scheduled).
   "triggers": { "crons": ["0 0 * * *"] },
@@ -36,7 +38,8 @@
         "IVME_EDITION": "ai",
         "EMAIL_PROVIDER": "log",
         "IVME_LANG": "en",
-        "IVME_ALT_DEMO_URL": "https://ivme.ysfdurak.com"
+        "IVME_ALT_DEMO_URL": "https://ivme.ysfdurak.com",
+        "IVME_PUBLIC_URL": "https://ivme-en.ysfdurak.com"
       },
       "triggers": { "crons": ["0 0 * * *"] }
     }
