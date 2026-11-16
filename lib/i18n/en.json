@@ -2136,5 +2136,7 @@
  "İngiliz sterlini (GBP)": "British pound (GBP)",
  "Geçerli bir para birimi seçin.": "Choose a valid currency.",
  "Para birimi {0} olarak ayarlandı.": "Currency set to {0}.",
- "olarak ayarlandı.": "set."
+ "olarak ayarlandı.": "set.",
+ "İvme · Kaizen ve çalışan öneri sistemi": "İvme · Kaizen and employee suggestion system",
+ "Çalışan önerisini değerlendirmeden aksiyona, kazanca, puana ve ödüle kadar tek akışta yöneten ücretsiz öneri ve kaizen sistemi. Rolle girip örnek verili demoyu deneyin.": "A free suggestion and kaizen system that runs an employee idea from review to action, savings, scoring and reward in one flow. Pick a role and try the demo with sample data."
 }
