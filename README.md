@@ -107,4 +107,29 @@ Security: passwords are stored with PBKDF2; new accounts get a one-time temporar
 
 ## Lisans
 
-© 2026 Yusuf Durak. Tüm hakları saklıdır. Kod incelenebilir; izinsiz kopyalanamaz, kurulamaz ve ticari amaçla kullanılamaz. Ayrıntı: [LICENSE](LICENSE). İletişim: [ysfdurak.com](https://ysfdurak.com)
+Bu proje [PolyForm Shield 1.0.0](LICENSE.md) lisansıyla yayınlanır. Kaynak kodu açıktır, ancak resmi anlamda bir "açık kaynak" lisansı değildir.
+
+- **Serbest:** Kişiler, okullar ve şirketler kendi işlerinde ücretsiz kullanabilir, değiştirebilir ve kendi bilgisayarlarına ya da sunucularına kurabilir. İzin almak gerekmez.
+- **Yazılı izin gerekir:** Yazılımı satmak, adını değiştirip ürün gibi sunmak ya da bununla (ücretsiz olsa bile) rakip bir ürün veya hizmet sunmak.
+- **Garanti yok:** Yazılım olduğu gibi sunulur. Bağlayıcı olan İngilizce lisans metnidir.
+- Üçüncü taraf bileşenler kendi lisanslarına tabidir.
+- Üçüncü taraf parçaların listesi: [UCUNCU-TARAF.md](UCUNCU-TARAF.md).
+
+**Kurum içinde kurulum:** Yukarıdaki **Yayın** bölümündeki "Şirket kurulumu için" maddelerine bakın. Gerçek kullanımda verinin kurum sunucusuna (VPS, PostgreSQL) taşınması önerilir.
+
+Kurumunuzda kullanıyorsanız haber verirseniz sevinirim: kurulumda yardımcı olabilir, kurumunuza özel ihtiyaçları birlikte değerlendirebiliriz. İletişim: iletisim@ysfdurak.com
+
+### License (English)
+
+Released under [PolyForm Shield 1.0.0](LICENSE.md). The source is available, but this is not an OSI "open source" licence.
+
+- **Free:** individuals, schools and companies may use it in their own work, change it and run it on their own computers or servers. No permission needed.
+- **Needs written permission:** selling it, rebranding it as a product, or providing a product or service that competes with it (even free of charge).
+- **No warranty:** provided as is. The English licence text is binding.
+- Third-party components keep their own licences.
+- List of third-party parts: [UCUNCU-TARAF.md](UCUNCU-TARAF.md).
+
+**Installing it in your organisation:** see "Şirket kurulumu için" (company setup) under **Yayın** above. For real use, moving the data to your own server (VPS, PostgreSQL) is recommended.
+
+Using it in your organisation? I'd be glad to hear from you: I can help with setup and look at your organisation's needs together. Contact: contact@ysfdurak.com
+
