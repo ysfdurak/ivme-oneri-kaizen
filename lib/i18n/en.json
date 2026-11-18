@@ -2138,5 +2138,12 @@
  "Para birimi {0} olarak ayarlandı.": "Currency set to {0}.",
  "olarak ayarlandı.": "set.",
  "İvme · Kaizen ve çalışan öneri sistemi": "İvme · Kaizen and employee suggestion system",
- "Çalışan önerisini değerlendirmeden aksiyona, kazanca, puana ve ödüle kadar tek akışta yöneten ücretsiz öneri ve kaizen sistemi. Rolle girip örnek verili demoyu deneyin.": "A free suggestion and kaizen system that runs an employee idea from review to action, savings, scoring and reward in one flow. Pick a role and try the demo with sample data."
+ "Çalışan önerisini değerlendirmeden aksiyona, kazanca, puana ve ödüle kadar tek akışta yöneten ücretsiz öneri ve kaizen sistemi. Rolle girip örnek verili demoyu deneyin.": "A free suggestion and kaizen system that runs an employee idea from review to action, savings, scoring and reward in one flow. Pick a role and try the demo with sample data.",
+ "Brüt · yıllık · ayrıca {0} onay bekliyor": "Gross · annual · plus {0} awaiting approval",
+ "Etki zinciri": "Impact chain",
+ "1 · Beklenen (öneri anında)": "1 · Expected (when proposed)",
+ "Yazılmadı": "Not written",
+ "2 · Gerçekleşen (uygulama sonrası ölçüm)": "2 · Realised (measured after implementation)",
+ "Henüz ölçülmedi": "Not measured yet",
+ "3 · Onaylı (müdür)": "3 · Approved (manager)"
 }

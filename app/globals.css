@@ -8775,3 +8775,39 @@ b.overdue {
     display: none;
   }
 }
+
+/* Kazanç sekmesi: beklenen → gerçekleşen → onaylı */
+.impact-chain {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 18px;
+}
+.impact-chain > div {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.impact-chain > div.done {
+  border-color: #9fd3c3;
+  background: #f1faf6;
+}
+.impact-chain small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.impact-chain b {
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .impact-chain {
+    grid-template-columns: 1fr;
+  }
+}
