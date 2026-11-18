@@ -2,6 +2,7 @@
 // Kullanıcı kendi raporunu kurar: ör. "2026 yılında tamamlanan iyileştirmelerin aylık net kazancı",
 // "bölümlere göre onaylı kazanç", "müdürlüklere göre katılım". Hesap yalnız kullanıcının görebildiği önerilerle yapılır.
 import { ANON, Proposal, User, gainFigures } from "./model";
+import { getLocale } from "./i18n";
 
 export type DateBasis = "created" | "completed" | "gainApproved";
 export type GroupBy =
@@ -125,20 +126,12 @@ export const MEASURES: {
     hint: "Zaman, kalite, iş güvenliği, ergonomi kazancı onaylanan öneri",
   },
 ];
-export const MONTHS = [
-  "Oca",
-  "Şub",
-  "Mar",
-  "Nis",
-  "May",
-  "Haz",
-  "Tem",
-  "Ağu",
-  "Eyl",
-  "Eki",
-  "Kas",
-  "Ara",
-];
+const MONTHS_TR = ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"];
+const MONTHS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/** Kısa ay adları arayüz diline göre (rapor satırları "Eyl 2026" / "Sep 2026"). */
+export const monthNames = () => (getLocale() === "en" ? MONTHS_EN : MONTHS_TR);
+/** Geriye dönük uyumluluk: Türkçe kısa ay adları. */
+export const MONTHS = MONTHS_TR;
 const IMPLEMENTED = [
   "Uygulamada",
   "Kazanç girişi",
@@ -278,7 +271,7 @@ function groupKey(
     case "month":
       return {
         key: d.slice(0, 7),
-        label: MONTHS[Number(d.slice(5, 7)) - 1] + " " + d.slice(0, 4),
+        label: monthNames()[Number(d.slice(5, 7)) - 1] + " " + d.slice(0, 4),
       };
     case "quarter": {
       const q = Math.floor((Number(d.slice(5, 7)) - 1) / 3) + 1;
@@ -453,7 +446,7 @@ export function describe(c: ReportConfig) {
     DATE_BASES.find((d) => d.id === c.dateBasis)!.label +
       ": " +
       (c.year || "tüm yıllar") +
-      (c.month ? " " + MONTHS[Number(c.month) - 1] : ""),
+      (c.month ? " " + monthNames()[Number(c.month) - 1] : ""),
     c.status !== "all" &&
       {
         open: "açık",

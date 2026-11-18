@@ -14,9 +14,11 @@ import { pathToFileURL } from "node:url";
 import { DEFAULT_REWARD_SETTINGS } from "../../lib/rewards";
 import { VERI_EN, FIRST_EN, LAST_EN, LISTS_EN, SCORING_EN, REWARD_LABELS_EN } from "./veri-en";
 import { DEFAULT_LISTS } from "../../lib/definitions";
+import { CATALOG, LONG_ENTRY, ACTIONS_EN, type Entry } from "./katalog";
 // IVME_DIL=en: İngilizce canlı demo verisi (lib/vitrin/en). Veri metinleri İngilizce, sistem kodları Türkçe kalır.
 const EN = process.env.IVME_DIL === "en";
-const L = (x: string) => (EN ? (VERI_EN[x] ?? x) : x);
+const L = (x: string) => (EN ? (VERI_EN[x] ?? ACTIONS_EN[x] ?? x) : x);
+const B = (x: [string, string]) => (EN ? x[1] : x[0]);
 let seed = 42;
 const rnd = () =>
   (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
@@ -302,72 +304,62 @@ const s: any = {
 };
 const get = (id: string) => users.find((u) => u.id === id);
 const call = (b: any, u: U) => applyCommand(s, b, u, users);
-const TITLES: Record<string, string[]> = {
-  [L("Mal Kabul")]: [
-    L("Randevu saatlerinin araç tipine göre ayrılması"),
-    L("Irsaliye kontrolünün el terminaline taşınması"),
-    L("Hasarlı koli fotoğrafının kabulde zorunlu olması"),
-    L("Rampa önünde palet birikmesinin önlenmesi"),
-  ],
-  [L("Depolama")]: [
-    L("Raf adres etiketlerinin büyütülmesi"),
-    L("Hızlı dönen ürünlerin bel hizasına alınması"),
-    L("Boş lokasyonların günlük raporlanması"),
-    L("Yangın koridorlarının zemin işaretlemesi"),
-  ],
-  [L("Toplama")]: [
-    L("Toplama rotasının dalga bazlı planlanması"),
-    L("Sesli toplama pilotu"),
-    L("Eksik toplama için anlık uyarı"),
-    L("Toplama arabalarına bölmeli kasa"),
-  ],
-  [L("Sevkiyat")]: [
-    L("Sevkiyat etiketlerinde çift kontrol"),
-    L("Yükleme sırasının rota sırasına göre yapılması"),
-    L("Streç tüketiminin standartlaştırılması"),
-    L("Araç doluluk oranının artırılması"),
-  ],
-  [L("Nakliye")]: [
-    L("Boş dönüşlerin planlanması"),
-    L("Sürücü teslim belgelerinin dijitalleşmesi"),
-    L("Yakıt tüketiminin rota bazında izlenmesi"),
-  ],
-  [L("Montaj Hattı")]: [
-    L("Vida sıkma torkunun hat başında doğrulanması"),
-    L("Hat dengesizliğinin istasyon yeniden dağılımıyla giderilmesi"),
-    L("Malzeme besleme sıklığının kanbanla yönetilmesi"),
-    L("Operatör değişiminde standart iş kartı"),
-  ],
-  [L("Kalite Kontrol")]: [
-    L("Giriş kalitede numune sayısının risk bazlı belirlenmesi"),
-    L("Hata kodlarının tek listede toplanması"),
-    L("Ölçüm cihazı kalibrasyon hatırlatması"),
-  ],
-  [L("Bakım")]: [
-    L("Kompresör kaçaklarının haftalık taranması"),
-    L("Otonom bakım kontrol listesi"),
-    L("Yedek parça minimum stok takibi"),
-    L("Forklift şarj alanında görsel yönlendirme"),
-  ],
-  [L("Satın Alma")]: [
-    L("Tedarikçi teslim performansının aylık paylaşılması"),
-    L("Ambalaj malzemesinde tek tedarikçi riskinin azaltılması"),
-    L("Sipariş onay adımlarının sadeleştirilmesi"),
-  ],
+// Her bölümün öneri kataloğu (katalog.ts): başlık, sınıf, sorun, çözüm, fayda ve kazanç ölçümü birbiriyle uyumlu.
+const ENTRIES: Record<string, Entry[]> = Object.fromEntries(
+  Object.entries(CATALOG).map(([op, list]) => [L(op), list]),
+);
+// Kazanç hesabı: tutar ölçümden çıkar, açıklama aynı hesabı anlatır. İngilizce demo dolar kullanır (≈ 1/20).
+const FX = EN ? 1 / 20 : 1;
+const fmt = (v: number) =>
+  EN ? v.toLocaleString("en-GB", { maximumFractionDigits: 2 }) : v.toLocaleString("tr-TR", { maximumFractionDigits: 2 });
+const money = (v: number) => (EN ? "$" + fmt(v) : fmt(v) + " ₺");
+const roundTo = (v: number) => (EN ? Math.round(v / 50) * 50 : Math.round(v / 500) * 500);
+const gainOf = (en: Entry) => {
+  const g = en.gain;
+  if (g.kind === "soft")
+    return { amount: 0, type: L(g.type), before: B(g.before), after: B(g.after), explanation: B(g.note), period: "Tek seferlik" };
+  if (g.kind === "time") {
+    const rate = 8 * FX;
+    const saved = g.before - g.after;
+    return {
+      amount: roundTo(saved * 2 * 250 * rate),
+      type: "Parasal",
+      before: EN ? `${g.before} min per shift` : `Vardiya başına ${g.before} dk`,
+      after: EN ? `${g.after} min per shift` : `Vardiya başına ${g.after} dk`,
+      explanation: EN
+        ? `${saved} min saved per shift × 2 shifts × 250 days × ${money(rate)}/min labour cost.`
+        : `Vardiya başına ${saved} dk × 2 vardiya × 250 gün × ${money(rate)}/dk işçilik maliyeti.`,
+      period: "Yıllık",
+    };
+  }
+  if (g.kind === "error") {
+    const cost = g.cost * FX;
+    const d = g.before - g.after;
+    return {
+      amount: roundTo(d * 12 * cost),
+      type: "Parasal",
+      before: EN ? `${g.before} error${g.before === 1 ? "" : "s"} a month` : `Ayda ${g.before} hata`,
+      after: EN ? `${g.after} error${g.after === 1 ? "" : "s"} a month` : `Ayda ${g.after} hata`,
+      explanation: EN
+        ? `${d} fewer errors a month × 12 months × ${money(cost)} average cost per error.`
+        : `Ayda ${d} hata daha az × 12 ay × hata başına ortalama ${money(cost)}.`,
+      period: "Yıllık",
+    };
+  }
+  const price = g.price * FX;
+  const d = g.before - g.after;
+  const unit = B(g.unit);
+  return {
+    amount: roundTo(d * 12 * price),
+    type: "Parasal",
+    before: EN ? `${fmt(g.before)} ${unit} a month` : `Ayda ${fmt(g.before)} ${unit}`,
+    after: EN ? `${fmt(g.after)} ${unit} a month` : `Ayda ${fmt(g.after)} ${unit}`,
+    explanation: EN
+      ? `${fmt(d)} ${unit} saved a month × 12 months × ${money(price)} per unit.`
+      : `Ayda ${fmt(d)} ${unit} daha az × 12 ay × birim başına ${money(price)}.`,
+    period: "Yıllık",
+  };
 };
-const PROBS = [
-  L("Vardiya başında aynı iş iki kez yapılıyor ve yaklaşık 20 dakika kayboluyor."),
-  L("Elle yapılan kontrol nedeniyle ayda ortalama 6-8 hata müşteriye ulaşıyor."),
-  L("Operatörler malzeme bulmak için hat dışına çıkıyor, hat duruyor."),
-  L("Bilgi kâğıt üzerinde tutulduğu için geçmişe dönük analiz yapılamıyor."),
-  L("Ergonomik olmayan duruş nedeniyle şikâyetler artıyor."),
-];
-const SOLS = [
-  L("Basit bir görsel işaretleme ve standart iş kartı ile adımların netleştirilmesi."),
-  L("El terminaline okutma adımı eklenerek kontrolün sistemden yapılması."),
-  L("Malzemenin kullanım noktasına yakın konumlandırılması ve kanban kartı."),
-  L("Excel yerine ortak ekranda takip ve haftalık gözden geçirme toplantısı."),
-];
 // hedef durum dağılımı. IVME_OLCEK=0.4 gibi bir değerle daha küçük veri üretilir (canlı demo için).
 const SCALE = Number(process.env.IVME_OLCEK || 1);
 const fill = (n: number, v: string) =>
@@ -390,27 +382,20 @@ const smallPng =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 targets.sort(() => rnd() - 0.5);
 for (const target of targets) {
-  const op = pick(Object.keys(OPS));
+  const long = rnd() < 0.03;
+  // Uzun başlıklı örnek her zaman Sevkiyat bölümündedir.
+  const op = long ? L("Sevkiyat") : pick(Object.keys(OPS));
+  const entry: Entry = long ? LONG_ENTRY : pick(ENTRIES[op]);
   const author =
     rnd() < 0.15 ? pick(Object.values(byRole).flat()) : pick(employees);
-  const long = rnd() < 0.04;
   const id = call(
     {
       action: "create",
-      title: long
-        ? L("Sevkiyat alanında yükleme öncesi palet etiketlerinin, sipariş numarası ve müşteri bilgisiyle el terminalinden çift kontrol edilerek yanlış araç yüklemesinin tamamen önlenmesi")
-        : pick(TITLES[op]),
-      problem: pick(PROBS) + (long ? " " + PROBS.join(" ") : ""),
-      solution: pick(SOLS),
+      title: L(entry.title),
+      problem: B(entry.problem),
+      solution: B(entry.solution),
       operation: op,
-      category: pick([
-        L("Verimlilik"),
-        L("Kalite"),
-        L("Maliyet"),
-        L("İş güvenliği"),
-        L("Ergonomi"),
-        L("Çevre"),
-      ]),
+      category: L(entry.category),
       attachments:
         rnd() < 0.2 ? [{ name: L("saha-fotografi.png"), data: smallPng }] : [],
       location:
@@ -424,14 +409,7 @@ for (const target of targets) {
               L("Sevkiyat sahası"),
             ])
           : "",
-      expectedBenefit:
-        rnd() < 0.5
-          ? pick([
-              L("Vardiya başına ~15 dk kazanç"),
-              L("Ayda 5-6 hata önlenir"),
-              L("Forklift trafiğinde güvenlik artar"),
-            ])
-          : "",
+      expectedBenefit: rnd() < 0.5 ? B(entry.benefit) : "",
       coAuthors:
         rnd() < 0.15
           ? [pick(employees.filter((e) => e.id !== author.id)).id]
@@ -524,7 +502,7 @@ for (const target of targets) {
         );
       continue;
     }
-    const nAct = int(1, 4);
+    const nAct = int(1, entry.actions.length);
     const actionOwners = [
       ...byRole["operation:" + OPS[op]],
       ...employees.filter((e) => e.directorate === OPS[op]),
@@ -534,14 +512,7 @@ for (const target of targets) {
         {
           action: "addAction",
           id,
-          title: pick([
-            L("Pilot uygulama"),
-            L("Görsel işaretleme"),
-            L("Standart iş kartı hazırla"),
-            L("Ekip eğitimi"),
-            L("Sonuç ölçümü"),
-            L("Tedarikçi ile görüşme"),
-          ]),
+          title: L(entry.actions[i]),
           owner: pick(actionOwners).id,
           due:
             "2026-" +
@@ -634,21 +605,18 @@ for (const target of targets) {
       );
     call({ action: "finish", id, outcome: "implemented" }, as(p.owner));
     if (target === STAGES[4]) continue;
-    const money = rnd() < 0.7;
+    const g = gainOf(entry);
     call(
       {
         action: "gain",
         id,
-        amount: money ? int(2, 120) * 1000 : 0,
-        cost: int(0, 20) * 500,
-        period: pick(["Tek seferlik", "Aylık", "Yıllık", "Yıllık"]),
-        type: money
-          ? "Parasal"
-          : pick([L("Zaman"), L("Kalite"), L("İş güvenliği"), L("Ergonomi")]),
-        before: L("Önce 20 dk"),
-        after: L("Sonra 8 dk"),
-        explanation:
-          L("Vardiya başına 12 dakika × 3 vardiya × 250 gün üzerinden hesaplandı."),
+        amount: g.amount,
+        cost: roundTo(int(0, g.amount ? 16 : 6) * 500 * FX),
+        period: g.period,
+        type: g.type,
+        before: g.before,
+        after: g.after,
+        explanation: g.explanation,
       },
       as(p.owner),
     );

@@ -19,7 +19,7 @@ import {
   DEFAULT_CONFIG,
   GROUPS,
   MEASURES,
-  MONTHS,
+  monthNames,
   ReportConfig,
   dateOf,
   describe,
@@ -38,9 +38,10 @@ type Props = {
   userId: string;
 };
 
+// Para, uygulamanın geri kalanıyla aynı biçimde: sembol önde (₺1.670.500 / $1,670,500).
 const fmt = (n: number, money?: boolean) =>
   money
-    ? n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 }) + " " + currency()
+    ? currency() + n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 })
     : n.toLocaleString(intlLocale(), { maximumFractionDigits: 1 });
 
 function csv(name: string, rows: (string | number)[][]) {
@@ -272,7 +273,7 @@ export default function ReportBuilder({
               "Ay",
               c.month,
               (v) => set({ month: v }),
-              MONTHS.map((m, i) => [String(i + 1), m]),
+              monthNames().map((m, i) => [String(i + 1), m]),
               "Tüm aylar",
             )}
           </fieldset>

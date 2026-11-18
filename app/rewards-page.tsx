@@ -19,7 +19,7 @@ type Props = {
 };
 
 const money = (n: number) =>
-  n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 }) + " " + currency();
+  currency() + n.toLocaleString(intlLocale(), { maximumFractionDigits: 0 });
 const thisMonth = () =>
   new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 7);
 
