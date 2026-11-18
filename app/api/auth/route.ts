@@ -22,6 +22,12 @@ function altDemo() {
   const lang = localeFrom((env as any).IVME_LANG) === "en" ? "tr" : "en";
   return { url, lang, label: lang === "en" ? "English demo with English sample data →" : "Türkçe örnek veriyle Türkçe demo →" };
 }
+/** Vitrin demosunda ortak ölçüm servisi (OLCUM_URL, OLCUM_PROJE). Şirket kurulumunda hiç gönderilmez. */
+function olcum() {
+  const url = String((env as any).OLCUM_URL || "").trim();
+  const proje = String((env as any).OLCUM_PROJE || "").trim();
+  return /^https:\/\/[a-z0-9.-]+$/i.test(url) && /^[a-z0-9-]{1,40}$/.test(proje) ? { url, proje } : null;
+}
 // Kullanıcı adının var olup olmadığı veya hesabın kilitli olduğu dışarıdan anlaşılmasın diye tek mesaj kullanılır.
 const LOGIN_FAILED =
   "Kullanıcı adı veya şifre yanlış. Art arda 5 hatalı denemede hesap 5 dakika kilitlenir.";
@@ -33,7 +39,7 @@ export async function GET(req: Request) {
       user: user ? publicUser(user) : null,
       demo: demoMode(),
       edition: edition(),
-      ...(showcase() ? { showcase: SHOWCASE_ROLES, altDemo: altDemo() } : {}),
+      ...(showcase() ? { showcase: SHOWCASE_ROLES, altDemo: altDemo(), olcum: olcum() } : {}),
     });
   } catch {
     return json({ error: "Veri tabanına erişilemiyor." }, 503);

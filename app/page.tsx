@@ -94,6 +94,7 @@ import {
 import RewardsPage from "./rewards-page";
 import ReportBuilder from "./report-builder";
 import { DemoGuide } from "./demo-guide";
+import { olc, olcumBaslat, type OlcumAyari } from "./olcum";
 import { pickRule, rewardText } from "../lib/rewards";
 import { REPORTS } from "../lib/dashboard";
 const NAV = [
@@ -407,6 +408,9 @@ export default function App() {
     >(null),
     [edition, setEdition] = useState("surec"),
     [altDemo, setAltDemo] = useState<{ url: string; lang: string; label: string } | null>(null),
+    // Vitrinde ortak ölçüm ve geri bildirim (app/olcum.ts); şirket kurulumunda null kalır.
+    [olcum, setOlcum] = useState<OlcumAyari | null>(null),
+    [olcumHazir, setOlcumHazir] = useState(false),
     [state, setState] = useState<State | null>(null),
     [users, setUsers] = useState<User[]>([]),
     [version, setVersion] = useState(0),
@@ -581,12 +585,21 @@ export default function App() {
         setShowcase(Array.isArray(b.showcase) ? b.showcase : null);
         setEdition(b.edition === "ai" ? "ai" : "surec");
         setAltDemo(b.altDemo && typeof b.altDemo.url === "string" ? b.altDemo : null);
+        if (b.olcum && typeof b.olcum.url === "string") {
+          setOlcum(b.olcum);
+          olcumBaslat(b.olcum, () => setOlcumHazir(true));
+        }
         if (!b.demo) setLogin((l) => ({ ...l, username: "" }));
         if (b.error) setError(b.error);
       })
       .catch(() => setError("Bağlantı kurulamadı. Sayfayı yenileyin."))
       .finally(() => setBoot(false));
   }, []);
+  // Ölçüm: hangi ekranda ne kadar kalındı (yalnızca vitrin; olcum yoksa olc() hiçbir şey yapmaz).
+  useEffect(() => {
+    if (boot) return;
+    olc("ekran", !user ? "giris" : detail ? "detay" : page);
+  }, [boot, user, page, detail]);
   useEffect(() => {
     versionRef.current = 0;
     if (user && !user.mustChange)
@@ -700,6 +713,10 @@ export default function App() {
         }),
         b: any = await r.json();
       if (!r.ok) throw Error(b.error);
+      if (action.startsWith("showcase:") && b.user) {
+        olc("olay", "oturum:giris");
+        olc("olay", "rol:" + action.slice(9));
+      }
       setUser(b.user || null);
       setState(null);
       if (action === "logout") {
@@ -730,6 +747,8 @@ export default function App() {
         if (r.status === 409) await refresh(true);
         throw Error(b.error);
       }
+      // Ölçüm: yalnızca işlemin adı (ör. "islem:create"); içeriği gönderilmez.
+      if (typeof data?.action === "string") olc("olay", "islem:" + data.action);
       await refresh();
       if (close) setModal(null);
       alert(
@@ -1350,6 +1369,15 @@ export default function App() {
           <Plus size={19} /> Yeni öneri oluştur
         </button>
         <div className="sidebar-bottom">
+          {olcumHazir && (
+            <button
+              type="button"
+              className="sidebar-feedback"
+              onClick={() => olc("geriBildirimAc", detail ? "detay" : page)}
+            >
+              <MessageSquare size={17} /> Geri bildirim ver
+            </button>
+          )}
           <div className="pilot-label">
             <i />{" "}
             {showcase
@@ -1407,6 +1435,17 @@ export default function App() {
             </span>
           </div>
           <div className="topbar-right">
+            {olcumHazir && (
+              <button
+                type="button"
+                className="icon-button topbar-feedback"
+                aria-label="Geri bildirim ver"
+                title="Geri bildirim ver"
+                onClick={() => olc("geriBildirimAc", page)}
+              >
+                <MessageSquare size={17} />
+              </button>
+            )}
             <span className="sync">
               <i /> Güncel
             </span>

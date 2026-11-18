@@ -28,3 +28,4 @@ node tests/round6.integration.cjs
 node tests/mcp.integration.cjs
 node tests/round12.integration.cjs
 node tests/round13.integration.cjs
+node tests/olcum.integration.cjs
