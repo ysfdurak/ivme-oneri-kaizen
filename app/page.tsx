@@ -1460,7 +1460,7 @@ export default function App() {
                     <p>Önerilerini ilerlet, ekibinle birlikte iyileştir.</p>
                   </div>
                   <button
-                    className="primary"
+                    className="primary hero-create"
                     onClick={() => {
                       setFormStep(1);
                       navigate("new");
