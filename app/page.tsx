@@ -907,6 +907,16 @@ export default function App() {
     annual = gainProposals
       .filter((p) => p.gain.period === "Yıllık")
       .reduce((a, p) => a + p.gain.amount, 0);
+  // Girilmiş ama henüz müdür onayı almamış yıllık kazanç (raporda onaylıdan ayrı gösterilir)
+  const pendingAnnual = proposals
+    .filter(
+      (p) =>
+        !["Reddedildi", "İptal edildi"].includes(p.status) &&
+        p.gain?.valid &&
+        !p.gain?.approved &&
+        p.gain?.period === "Yıllık",
+    )
+    .reduce((a, p) => a + (p.gain.amount || 0), 0);
   function openWork(item: Proposal) {
     setCommentText("");
     setDetail(item.id);
@@ -1657,7 +1667,10 @@ export default function App() {
                       <strong>{money(annual)}</strong>
                     </div>
                     <footer>
-                      Brüt tutar · yıllık dönem <ArrowUpRight size={16} />
+                      {pendingAnnual > 0
+                        ? `Brüt · yıllık · ayrıca ${money(pendingAnnual)} onay bekliyor`
+                        : "Brüt tutar · yıllık dönem"}{" "}
+                      <ArrowUpRight size={16} />
                     </footer>
                   </button>
                 </div>
@@ -4745,6 +4758,35 @@ export default function App() {
               )}
               {detailTab === "gain" && (
                 <>
+                  <div className="impact-chain" aria-label="Etki zinciri">
+                    <div>
+                      <small>1 · Beklenen (öneri anında)</small>
+                      <b>{p.expectedBenefit || "Yazılmadı"}</b>
+                    </div>
+                    <div className={p.gain?.valid ? "done" : ""}>
+                      <small>2 · Gerçekleşen (uygulama sonrası ölçüm)</small>
+                      <b>
+                        {p.gain?.valid
+                          ? (p.gain.type === "Parasal"
+                              ? money(p.gain.amount) + " · " + p.gain.period
+                              : p.gain.type) +
+                            (p.gain.before || p.gain.after
+                              ? ` · ${p.gain.before || "?"} → ${p.gain.after || "?"}`
+                              : "")
+                          : "Henüz ölçülmedi"}
+                      </b>
+                    </div>
+                    <div className={p.gain?.valid && p.gain?.approved ? "done" : ""}>
+                      <small>3 · Onaylı (müdür)</small>
+                      <b>
+                        {p.gain?.valid && p.gain?.approved
+                          ? `${who(p.gain.approver)}${p.gain.approvedAt ? " · " + new Date(p.gain.approvedAt).toLocaleDateString(intlLocale()) : ""}`
+                          : p.gain?.valid
+                            ? "Onay bekliyor"
+                            : "—"}
+                      </b>
+                    </div>
+                  </div>
                   {p.gain ? (
                     <>
                       <div className="gain-hero">
