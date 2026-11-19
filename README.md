@@ -12,6 +12,9 @@
 | **Öneri detayı** | **Rapor oluşturucu** |
 | ![Öneri detayı](docs/ekranlar/05-oneri-detayi.png) | ![Rapor oluşturucu](docs/ekranlar/04-rapor-olusturucu.png) |
 
+
+**Kurumda kullanacaksan:** Çalışanların kişisel verisi işlenir. KVKK notları, çalışan duyurusu ve (video projelerinde) çekim öncesi onay şablonu: [docs/KVKK_VE_CALISAN_BILGILENDIRME.md](docs/KVKK_VE_CALISAN_BILGILENDIRME.md).
+
 ## Ne çözer
 
 Kâğıt formlarda ya da e-posta zincirlerinde yürüyen öneri sistemlerinde öneri kaybolur, kimde beklediği bilinmez, kazanç ölçülmez, öneren geri bildirim alamaz. İvme her öneriyi sahibi belli, hedef süresi olan bir iş olarak izler ve sonucunu ölçer.
