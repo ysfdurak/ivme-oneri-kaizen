@@ -26,6 +26,7 @@ function languageRedirect(request: Request): Response | null {
 // public/_headers ile alır. Uygulamanın kendi koyduğu başlığın üzerine yazılmaz.
 const GUVENLIK_BASLIKLARI: Record<string, string> = {
   "X-Content-Type-Options": "nosniff",
+  "Strict-Transport-Security": "max-age=31536000",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "X-Frame-Options": "DENY",
   "Content-Security-Policy": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
