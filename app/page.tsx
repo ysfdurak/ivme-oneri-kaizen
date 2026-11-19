@@ -2763,7 +2763,9 @@ export default function App() {
                                 takip edersin, bildirim sana gelir. Revizyon
                                 istenirse yine sen düzenlersin. Ödül hak edersen
                                 adın yalnızca ödeme için ödül sorumlusuna (İK)
-                                görünür.
+                                görünür. Küçük ekipte kimin yazdığı içerikten
+                                tahmin edilebilir; yalnız iş yerini değil seni
+                                tanıtacak ayrıntıları yazma.
                               </small>
                             </span>
                           </label>
@@ -4301,7 +4303,7 @@ export default function App() {
                         <small>Gizlilik</small>
                         <b>
                           {p.author === user.id
-                            ? "Anonim gönderdin; adın başkalarına görünmez"
+                            ? "Anonim gönderdin; adın değerlendiricilere ve yöneticilere gösterilmez"
                             : "Anonim öneri"}
                         </b>
                       </div>
