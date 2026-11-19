@@ -2802,6 +2802,11 @@ export default function App() {
                                 sonrası "sonra" fotoğrafı detaydan eklenir · PDF
                                 en fazla 500 KB
                               </small>
+                              {showcase && (
+                                <small className="showcase-warn" role="note">
+                                  Canlı demo ortaktır: yazdığın metin ve eklediğin dosyalar diğer ziyaretçilere de görünür, her gece silinir. Gerçek kişi, iş yeri ya da belge fotoğrafı ekleme.
+                                </small>
+                              )}
                             </div>
                             <label className="secondary">
                               {form.attachments.length >= 3

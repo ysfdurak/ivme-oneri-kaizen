@@ -2158,5 +2158,6 @@
  "Düzenleme istendi": "Edit requested",
  "Kazanç düzeltmeye gönderildi": "Sent back for gain correction",
  "Uygulanamadı olarak kapatıldı": "Closed as not implemented",
- "Öneren (anonim)": "Submitter (anonymous)"
+ "Öneren (anonim)": "Submitter (anonymous)",
+ "Canlı demo ortaktır: yazdığın metin ve eklediğin dosyalar diğer ziyaretçilere de görünür, her gece silinir. Gerçek kişi, iş yeri ya da belge fotoğrafı ekleme.": "The live demo is shared: the text you write and the files you add are visible to other visitors too and are deleted every night. Do not add photos of real people, workplaces or documents."
 }

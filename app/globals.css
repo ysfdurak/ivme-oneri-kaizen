@@ -8843,3 +8843,4 @@ b.overdue {
 .list-reason b {
   font-weight: 600;
 }
+.showcase-warn{display:block;margin-top:6px;color:#8a5a1f;font-weight:600}
