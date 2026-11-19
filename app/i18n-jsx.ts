@@ -1,6 +1,7 @@
 // Tarayıcıda React JSX çalışma zamanının yerine geçer (vite.config.ts → i18nJsx eklentisi).
 // Ekrana giden metinleri lib/i18n.ts → translate() ile çevirip gerçek çalışma zamanına iletir.
 // Türkçe seçiliyken hiçbir şey değiştirmez. Değerler (value, key, id…) hiç çevrilmez; yalnız görünen metin.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- bu satır bazı derlemelerde hatasız olduğundan @ts-expect-error kullanılamaz
 // @ts-ignore: gerçek çalışma zamanı (eklenti bu dosyanın kendi içe aktarmasını yeniden yönlendirmez)
 import * as real from "react/jsx-runtime";
 import { getLocale, translate as tr0, translateParts as tp0 } from "../lib/i18n";

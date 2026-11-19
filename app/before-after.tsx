@@ -51,7 +51,9 @@ export default function BeforeAfter({
     }
   }
 
-  const Gallery = ({
+  // Bileşen değil, düz işlev: render içinde tanımlanan bileşen her çizimde yeniden
+  // oluşur ve React galeriyi baştan kurar (görseller yeniden yüklenir, odak kaybolur).
+  const gallery = ({
     title,
     items,
     empty,
@@ -91,16 +93,19 @@ export default function BeforeAfter({
       <h3>Görseller ve ekler</h3>
       {(before.length > 0 || after.length > 0 || canAddAfter) && (
         <div className="ba-grid">
-          <Gallery title="Önce" items={before} empty="Önce fotoğrafı yok." />
-          <Gallery
-            title="Sonra"
-            items={after}
-            empty={
+          {gallery({
+            title: "Önce",
+            items: before,
+            empty: "Önce fotoğrafı yok.",
+          })}
+          {gallery({
+            title: "Sonra",
+            items: after,
+            empty:
               canAddAfter
                 ? "Uygulamadan sonraki hali ekle."
-                : "Henüz eklenmedi."
-            }
-          />
+                : "Henüz eklenmedi.",
+          })}
         </div>
       )}
       {canAddAfter && (

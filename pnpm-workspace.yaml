@@ -18,4 +18,11 @@ packageImportMethod: auto
 verifyDepsBeforeRun: false
 optimisticRepeatInstall: false
 overrides:
-  miniflare>sharp: 0.35.4
+  miniflare>sharp: 0.35.5
+  # Güvenlik yamaları (Kasım 2026 denetimi): dolaylı bağımlılıkların açık kapatılmış sürümleri.
+  browserslist: ^4.28.7
+  source-map-js: ^1.2.2
+  '@babel/core': ^7.29.6
+  fast-uri: ^3.1.9
+  baseline-browser-mapping: ^2.11.0
+  fflate: ^0.7.5
