@@ -27,7 +27,7 @@ Cloudflare Workers ve D1. Süreç kuralları saf bir komut işleyicide (lib/work
 Bütün çalışma alanı tek kayıtta duruyor; D1'in satır sınırı nedeniyle fotoğrafsız yaklaşık 600 öneriye kadar uygun. Gerçek kullanımda veri tablolara ayrılıp kurum sunucusuna taşınmalı.
 
 **9. Canlı demoda veri güvenliği?**
-Ortak demo: yazılanlar ve eklenen dosyalar diğer ziyaretçilere de görünür, her gece silinir; dosya alanında uyarı var. Fotoğrafların konum bilgisi yüklemeden önce siliniyor.
+Her ziyaretçiye 45 önerilik örnekle kendi alanı açılıyor ("v:<uuid>" çalışma alanı kaydı, alan çerezi); iki ziyaretçi birbirinin önerisini ve ekini göremiyor, bunu bir entegrasyon testi sınıyor. Kullanıcı tablosu ortak olduğu için kişi ekleme, aktarım ve şifre işlemleri demoda kapalı. Günde 600, IP başına saatte 20 alan sınırı; her gece silme. Fotoğrafların konum bilgisi yüklemeden önce siliniyor.
 
 **10. Neyi farklı yapardın?**
 Veriyi baştan tablolara ayırırdım; hem ölçek sınırı hem ziyaretçiye özel demo alanı bundan dolayı zor.
@@ -35,8 +35,9 @@ Veriyi baştan tablolara ayırırdım; hem ölçek sınırı hem ziyaretçiye ö
 
 ## Bu projede verdiğim kararlar (sorun → karar → bedel)
 
+- **Denetim izi:** Onaylanan kazanç onay anındaki para birimi ve onay notuyla saklanıyor; puan verildiği andaki kriterlerle. Tanımlar sonradan değişince eski kararın yeniden kurulabildiğini tests/audit.test.ts sınıyor.
 - **Anonim adın sızması:** Devir geçmişinde ad görünüyordu → geçmiş metinleri de temizleniyor ve test var → sınır: içerikten tahmin engellenemez.
-- **Ziyaretçiye özel demo alanı ertelendi:** Ortak demoda ziyaretçiler birbirinin eklediğini görüyor → şimdilik uyarı → kalıcı çözüm verinin tablolara ayrılması (alan başına ~360 KB kopya veritabanını şişirir).
+- **Ziyaretçiye özel demo alanı:** Ortak demoda ziyaretçi gerçek saha fotoğrafı ekleyebilirdi; önce yalnız uyarı koymuştum, dış inceleme bunun yetmediğini gösterdi → her ziyaretçiye küçültülmüş örnekle kendi alanı (tam kopya ~360 KB yerine ~160 KB), kullanıcı tanımları demoda kilitli → demoda kişi yönetimi denenemiyor.
 - **Şirket kurulumu:** Cloudflare yurt dışında veri işleyebilir → KVKK notunda belirtildi, VPS önerildi → kurum karar vermeli.
 
 ---

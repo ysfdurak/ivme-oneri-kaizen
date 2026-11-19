@@ -1,4 +1,4 @@
-import { current, db, json, users } from "../../../lib/server";
+import { current, db, json, users, wsId } from "../../../lib/server";
 import { canSee, redactProposal } from "../../../lib/model";
 import { migrateState } from "../../../lib/migrate";
 import { tick } from "../../../lib/outbox";
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
         );
   const head = await db()
     .prepare("SELECT version FROM workspace WHERE id=?")
-    .bind("main")
+    .bind(wsId(req))
     .first<any>();
   if (known && head && known === head.version)
     return json({
@@ -36,7 +36,7 @@ export async function GET(req: Request) {
     });
   const row = await db()
     .prepare("SELECT * FROM workspace WHERE id=?")
-    .bind("main")
+    .bind(wsId(req))
     .first<any>();
   const state = migrateState(JSON.parse(row.data), allUsers);
   // Günlük bildirim işleri (gecikme hatırlatması, özet) uygulama kullanıldıkça kendiliğinden çalışır.

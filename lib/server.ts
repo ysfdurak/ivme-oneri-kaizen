@@ -120,11 +120,31 @@ export function publicUser(u: any) {
     notify: u.notify || "instant",
   };
 }
+// Vitrin: her ziyaretçinin kendi çalışma alanı var. Alan kimliği ayrı bir çerezde (ivme_alan) rastgele bir UUID'dir;
+// çalışma alanı kaydı "v:<uuid>" adıyla tutulur. Şirket kurulumunda tek kayıt vardır: "main".
+const SCOPE_RE = /(?:^|;\s*)ivme_alan=([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})(?:;|$)/;
+export function visitorScope(req: Request) {
+  return req.headers.get("cookie")?.match(SCOPE_RE)?.[1] || null;
+}
+/** Bu isteğin çalışma alanı kaydı. Vitrinde alan çerezi yoksa hiçbir kayıtla eşleşmeyen bir ad döner. */
+export function wsId(req: Request) {
+  if (!showcase()) return "main";
+  const scope = visitorScope(req);
+  return scope ? "v:" + scope : "v:yok";
+}
+export function scopeCookie(scope: string, age = 43200) {
+  return `ivme_alan=${scope}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${age}`;
+}
 export async function current(req: Request) {
   const token = req.headers
     .get("cookie")
     ?.match(/(?:^|; )ivme_session=([^;]+)/)?.[1];
   if (!token) return null;
+  // Vitrinde oturum, ziyaretçinin kendi çalışma alanı varken geçerlidir (gece sıfırlamasında ikisi birlikte silinir).
+  if (showcase()) {
+    const ws = await db().prepare("SELECT id FROM workspace WHERE id=?").bind(wsId(req)).first();
+    if (!ws) return null;
+  }
   return db()
     .prepare(
       "SELECT users.* FROM users JOIN sessions ON users.id=sessions.user_id WHERE sessions.token=? AND sessions.expires>? AND users.active=1",

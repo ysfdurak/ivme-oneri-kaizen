@@ -1,4 +1,4 @@
-import { current, db, json, users, sameOrigin } from "../../../lib/server";
+import { current, db, json, users, sameOrigin, wsId } from "../../../lib/server";
 import { canSee } from "../../../lib/model";
 import { migrateState } from "../../../lib/migrate";
 import { findSimilarSafe } from "../../../lib/similarity";
@@ -11,7 +11,7 @@ async function run(req: Request, input: any) {
   const u = await current(req);
   if (!u) return json({ error: "Oturum açın." }, 401);
   if (u.must_change) return json({ error: "Önce şifrenizi değiştirin." }, 403);
-  const row = await db().prepare("SELECT data FROM workspace WHERE id=?").bind("main").first<any>();
+  const row = await db().prepare("SELECT data FROM workspace WHERE id=?").bind(wsId(req)).first<any>();
   const allUsers = await users();
   const state = migrateState(JSON.parse(row.data), allUsers);
   const ctx = { users: allUsers, matrix: state.matrix, org: state.settings?.org };

@@ -1,4 +1,4 @@
-import { current, db, json, users } from "../../../lib/server";
+import { current, db, json, users, wsId } from "../../../lib/server";
 import { canSee } from "../../../lib/model";
 import { migrateState } from "../../../lib/migrate";
 /** Bir önerinin ek dosyasını, kullanıcı o öneriyi görebiliyorsa döner: /api/attachment?id=KZ-2026-0001&i=0 */
@@ -9,7 +9,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const id = url.searchParams.get("id");
   const index = Number(url.searchParams.get("i"));
-  const row = await db().prepare("SELECT data FROM workspace WHERE id=?").bind("main").first<any>();
+  const row = await db().prepare("SELECT data FROM workspace WHERE id=?").bind(wsId(req)).first<any>();
   const allUsers = await users();
   const state = migrateState(JSON.parse(row.data), allUsers);
   const p = state.proposals.find((p: any) => p.id === id);

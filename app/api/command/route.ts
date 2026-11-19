@@ -6,8 +6,7 @@ import {
   password,
   tempPassword,
   sameOrigin,
-  edition,
-} from "../../../lib/server";
+  edition, wsId, showcase } from "../../../lib/server";
 import { applyCommand } from "../../../lib/workflow";
 import { planImport, STATE_MAX_BYTES } from "../../../lib/proposal-import";
 import { migrateState } from "../../../lib/migrate";
@@ -29,6 +28,17 @@ export async function POST(req: Request) {
     const b = JSON.parse(raw);
     await ensureSchema();
     const us = await users();
+    const ws = wsId(req);
+    // Vitrin: kullanıcı tabloları bütün ziyaretçiler için ortaktır; kişi ekleme, düzenleme, aktarım, şifre ve
+    // bildirim tercihi gibi kullanıcı kaydını değiştiren işlemler demoda kapalıdır (yazılan ad başkasına görünmesin).
+    if (
+      showcase() &&
+      ["myPrefs", "importUsers", "importProposals", "resetPassword", "user", "deleteImported"].includes(b.action)
+    )
+      return json(
+        { error: "Canlı demoda kullanıcı tanımları ve aktarım kapalı. Kendi kurulumunda kullanılabilir." },
+        400,
+      );
     if (b.action === "myPrefs") {
       // Kişinin kendi bildirim tercihi: anında, günlük özet veya kapalı.
       if (!["instant", "digest", "off"].includes(b.notify))
@@ -94,7 +104,7 @@ export async function POST(req: Request) {
       {
         const row = await db()
           .prepare("SELECT data FROM workspace WHERE id=?")
-          .bind("main")
+          .bind(ws)
           .first<any>();
         const org = migrateState(JSON.parse(row.data), us).settings!.org!;
         if (b.role === "director") {
@@ -185,7 +195,7 @@ export async function POST(req: Request) {
     for (let attempt = 0; attempt < 3; attempt++) {
       const row = await db()
         .prepare("SELECT * FROM workspace WHERE id=?")
-        .bind("main")
+        .bind(ws)
         .first<any>();
       const s = migrateState(JSON.parse(row.data), us);
       if (b.version !== row.version) {
@@ -210,7 +220,7 @@ export async function POST(req: Request) {
         .prepare(
           "UPDATE workspace SET data=?,version=version+1 WHERE id=? AND version=?",
         )
-        .bind(JSON.stringify(s), "main", row.version)
+        .bind(JSON.stringify(s), ws, row.version)
         .run();
       if (r.meta.changes) {
         // Departmanın bağlı olduğu müdürlük değiştiyse kullanıcı kayıtları da güncellenir.
@@ -230,7 +240,7 @@ export async function POST(req: Request) {
                 .bind(uid)
                 .run();
         }
-        if (b.action === "defineOrg")
+        if (b.action === "defineOrg" && !showcase())
           for (const d of s.settings?.org?.departments || [])
             await db()
               .prepare(

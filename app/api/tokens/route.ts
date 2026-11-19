@@ -1,6 +1,6 @@
 // Kişisel MCP erişim anahtarları: GET listele, POST {action:"create", name} | {action:"revoke", id}.
 // Yalnız yapay zekâ paketinde ve MCP Tanımlar'dan açıkken.
-import { current, db, edition, json, sameOrigin } from "../../../lib/server";
+import { current, db, edition, json, sameOrigin, showcase } from "../../../lib/server";
 import {
   createToken,
   listTokens,
@@ -9,7 +9,8 @@ import {
 } from "../../../lib/tokens";
 
 async function enabled() {
-  if (edition() !== "ai") return false;
+  // Vitrinde kişisel erişim anahtarı yok: anahtar ortak demo kullanıcısına bağlanırdı.
+  if (edition() !== "ai" || showcase()) return false;
   const row = await db()
     .prepare("SELECT data FROM workspace WHERE id=?")
     .bind("main")

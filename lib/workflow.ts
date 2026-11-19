@@ -1715,10 +1715,16 @@ export function applyCommand(s: State, b: any, u: User, us: User[]) {
   }
   if (b.action === "gainApprove") {
     assert(responsible && p.status === STAGES[5] && p.gain, "Yetkiniz yok.");
+    const note = typeof b.note === "string" ? b.note.trim().slice(0, 500) : "";
     p.gain.approved = true;
     p.gain.valid = true;
     p.gain.approver = u.id;
     p.gain.approvedAt = now;
+    // Denetim izi: onaylanan kazanç, onay anındaki para birimi ve (varsa) onay notuyla saklanır. Tanımlar sonradan
+    // değişse de (ör. para birimi) eski kararın dayanağı kayıttan yeniden kurulabilir.
+    p.gain.currency = s.settings?.currency || "₺";
+    if (note) p.gain.approvalNote = note;
+    log(p, "Kazanç onaylandı" + (note ? ": " + note : "."));
     setStage(p, STAGES[6]);
     return;
   }

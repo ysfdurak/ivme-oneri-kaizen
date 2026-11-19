@@ -1,4 +1,4 @@
-import { current, db, json, users } from "../../../lib/server";
+import { current, db, json, users, wsId } from "../../../lib/server";
 import { canSee } from "../../../lib/model";
 import { migrateState } from "../../../lib/migrate";
 import { buildRecognition } from "../../../lib/recognition";
@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   if (u.must_change) return json({ error: "Önce şifrenizi değiştirin." }, 403);
   const row = await db()
     .prepare("SELECT data FROM workspace WHERE id=?")
-    .bind("main")
+    .bind(wsId(req))
     .first<any>();
   const allUsers = await users();
   const state = migrateState(JSON.parse(row.data), allUsers);

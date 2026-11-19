@@ -2,7 +2,7 @@
 
 Çalışanın sahadan verdiği iyileştirme önerisini; değerlendirme, aksiyon, kazanç, puan ve ödüle kadar tek akışta yöneten web uygulaması. Telefondan öneri verilir, masaüstünden yönetilir.
 
-**Canlı demo:** [ivme.ysfdurak.com](https://ivme.ysfdurak.com) (Türkçe) · [ivme-en.ysfdurak.com](https://ivme-en.ysfdurak.com) (English). Bir rol seçerek şifresiz girilir. Örnek bir şirketin 120 önerisi yüklüdür. Veriler her gece sıfırlanır, e-posta gönderilmez.
+**Canlı demo:** [ivme.ysfdurak.com](https://ivme.ysfdurak.com) (Türkçe) · [ivme-en.ysfdurak.com](https://ivme-en.ysfdurak.com) (English). Bir rol seçerek şifresiz girilir. Her ziyaretçiye örnek bir şirketin 45 önerisiyle sana özel bir alan açılır; başka ziyaretçiler yazdıklarını ve eklediklerini göremez. Kullanıcı tanımları ve aktarım demoda kapalıdır. Veriler her gece silinir, e-posta gönderilmez.
 
 ![Giriş: rol seçerek canlı demo](docs/ekranlar/01-giris.png)
 

@@ -1138,8 +1138,9 @@ export default function App() {
               <span className="eyebrow">CANLI DEMO</span>
               <h2>Bir rol seç, hemen dene</h2>
               <p>
-                Örnek bir şirketin 120 önerisiyle çalışan gerçek uygulama. Şifre
-                gerekmez; veriler her gece sıfırlanır, e-posta gönderilmez.
+                Örnek bir şirketin önerileriyle çalışan gerçek uygulama. Şifre
+                gerekmez; sana özel bir alan açılır, başka ziyaretçiler göremez.
+                Veriler her gece silinir, e-posta gönderilmez.
               </p>
               {error && (
                 <div className="error" role="alert">
@@ -1383,7 +1384,7 @@ export default function App() {
           <div className="pilot-label">
             <i />{" "}
             {showcase
-              ? "Canlı demo · her gece sıfırlanır"
+              ? "Canlı demo · sana özel alan · her gece silinir"
               : demo
                 ? orgName + " pilot sürümü"
                 : orgName}
@@ -2806,7 +2807,7 @@ export default function App() {
                               </small>
                               {showcase && (
                                 <small className="showcase-warn" role="note">
-                                  Canlı demo ortaktır: yazdığın metin ve eklediğin dosyalar diğer ziyaretçilere de görünür, her gece silinir. Gerçek kişi, iş yeri ya da belge fotoğrafı ekleme.
+                                  Bu demo alanı sana özel: yazdıkların ve eklediğin dosyalar diğer ziyaretçilere görünmez, her gece silinir. Yine de gerçek kişi, iş yeri ya da belge fotoğrafı ekleme.
                                 </small>
                               )}
                             </div>
@@ -5129,11 +5130,26 @@ export default function App() {
                   )}
                 {(admin || p.owner === user.id) && p.status === STAGES[5] && (
                   <>
+                    <input
+                      id={"gain-note-" + p.id}
+                      className="gain-note"
+                      maxLength={500}
+                      aria-label="Onay notu (isteğe bağlı)"
+                      placeholder="Onay notu (isteğe bağlı): hangi kaynakla doğrulandı?"
+                    />
                     <button
                       className="primary"
                       disabled={busy}
                       onClick={() =>
-                        command({ action: "gainApprove", id: p.id })
+                        command({
+                          action: "gainApprove",
+                          id: p.id,
+                          note: (
+                            document.getElementById(
+                              "gain-note-" + p.id,
+                            ) as HTMLInputElement | null
+                          )?.value,
+                        })
                       }
                     >
                       Kazancı onayla <Check size={16} />

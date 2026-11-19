@@ -518,3 +518,12 @@ Tanımlar → **Eski önerileri aktar** (yalnız sistem yöneticisi). Ayrıntıl
 - **Sorun:** `redactProposal` kimlik alanlarını (`author`, `owner`, `actor`) gizliyordu ama geçmiş **metinlerini** değiştirmiyordu. Anonim önerinin sahibi işten ayrılıp işleri devredildiğinde ("Kullanıcı devri: Ad → …"), pasife alındığında ya da öneri revizyondayken yönlendirildiğinde, önerenin adı geçmiş sekmesinde başkalarına görünüyordu. Sentetik kayıtla doğrulandı (`tests/round6.test.ts`: eski kodda test düşer).
 - **Düzeltme:** (1) Yazarken: `applyCommand` içindeki `log` ve pasif yönlendirme kaydı, anonim öneride önerenin adını "Öneren (anonim)" yazar. (2) Okurken: `redactProposal(p, izleyici, önerenAdı)` eski kayıtlardaki adı da metinden siler; `/api/state` ve MCP araçları adı verir. Önerenin kendisi kendi kaydını olduğu gibi görür.
 
+
+## Ziyaretçiye özel vitrin ve denetim izi (19 Kasım 2026)
+
+- **Sorun:** Canlı vitrin ortaktı; bir ziyaretçinin yazdığı öneri ve eklediği fotoğraf gece silinene kadar herkese görünüyordu. Uyarı eklemek yetmedi: bir çalışan gerçek saha fotoğrafı ya da isim yazabilir.
+- **Çözüm:** `lib/server.ts › wsId(req)` çalışma alanı kaydını seçer: şirket kurulumunda `main`, vitrinde `v:<uuid>` (alan kimliği `ivme_alan` çerezinde). Rol düğmesiyle girişte `lib/vitrin.ts › ensureVisitorWorkspace` şablondan (`main`) küçültülmüş bir kopya açar (`trimState`: demo rollerinin işi olan ve ödüllü öneriler önce, sonra her durumdan; 45 öneri, ~160 KB). Aynı tarayıcı rol değiştirince aynı alanda kalır. Alan çerezi olmayan oturum geçersizdir.
+- **Ortak kalanlar:** Kullanıcı tablosu bütün ziyaretçiler için ortak; onu değiştiren işlemler (kişi ekleme/düzenleme, kullanıcı ve öneri aktarımı, şifre sıfırlama, bildirim tercihi) vitrinde kapalıdır. Kişisel MCP anahtarı vitrinde yoktur.
+- **Sınırlar:** Günde en fazla 600 ziyaretçi alanı, aynı IP'den saatte 20 (`kv` tablosunda sayaç, gece silinir). Gece sıfırlaması bütün `v:` kayıtlarını ve oturumları siler.
+- **Test:** `tests/vitrin.integration.cjs`: iki ziyaretçi birbirinin önerisini ve ekini göremez; rol değişince alan aynı; kullanıcı işlemleri kapalı; alan çerezi şart; IP sınırı; gece sıfırlaması.
+- **Denetim izi:** `gainApprove` onay anındaki para birimini ve isteğe bağlı onay notunu kazanç kaydına yazar, nota geçmişe de düşer. `tests/audit.test.ts`: tanımlar (para birimi, puan kriterleri) sonradan değişse de onaylanan kazanç ve puan kayıttan aynen yeniden kurulur.

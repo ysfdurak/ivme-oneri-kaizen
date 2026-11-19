@@ -11,8 +11,10 @@ import {
   demoMode,
   edition,
   showcase,
+  visitorScope,
+  scopeCookie,
 } from "../../../lib/server";
-import { SHOWCASE_ROLES, SHOWCASE_USERNAMES } from "../../../lib/vitrin";
+import { SHOWCASE_ROLES, SHOWCASE_USERNAMES, ensureVisitorWorkspace } from "../../../lib/vitrin";
 import { env } from "cloudflare:workers";
 import { localeFrom } from "../../../lib/i18n";
 /** Vitrinde öteki dildeki demoya bağlantı (IVME_ALT_DEMO_URL). Bağlantı metni o demonun dilindedir. */
@@ -77,14 +79,20 @@ export async function POST(req: Request) {
           },
           503,
         );
+      // Ziyaretçinin kendi çalışma alanı: aynı tarayıcı rol değiştirince aynı alanda kalır.
+      const scope = visitorScope(req) || crypto.randomUUID();
+      const space = await ensureVisitorWorkspace(scope, req.headers.get("cf-connecting-ip") || "");
+      if (space === "full")
+        return json({ error: "Canlı demo şu an çok yoğun; yeni deneme alanı açılamıyor. Biraz sonra tekrar deneyin." }, 503);
       const token = crypto.randomUUID() + crypto.randomUUID();
       await db()
         .prepare("INSERT INTO sessions (token,user_id,expires) VALUES (?,?,?)")
         .bind(await hash(token), u.id, Date.now() + 43200000)
         .run();
-      return json({ user: publicUser(u) }, 200, {
-        "Set-Cookie": cookie(token),
-      });
+      const headers = new Headers({ "Cache-Control": "no-store" });
+      headers.append("Set-Cookie", cookie(token));
+      headers.append("Set-Cookie", scopeCookie(scope));
+      return Response.json({ user: publicUser(u) }, { status: 200, headers });
     }
     if (b.action === "password") {
       if (showcase())
