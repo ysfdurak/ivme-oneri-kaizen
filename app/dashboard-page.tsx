@@ -1122,6 +1122,26 @@ export default function DashboardPage(props: Props) {
         geldiği günden bugüne sayılır. Müdürlük ve departman, öneri şu an kimde
         bekliyorsa o kişinin birimine göre hesaplanır.
       </div>
+      <details className="bottom-note calc-help">
+        <summary>Bu sayılar nasıl hesaplanır?</summary>
+        <ul>
+          <li>
+            <b>Puan:</b> Her değerlendirme kriteri (değer ÷ ölçek) × ağırlık olarak toplanır, ağırlıkların toplamına bölünür ve 100 üzerinden yuvarlanır. Kriterler ve ağırlıklar Tanımlar › Puanlama kriterleri bölümünden değişir.
+          </li>
+          <li>
+            <b>İlk yıl brüt kazanç:</b> Aylık kazanç × 12; yıllık ve tek seferlik kazanç olduğu gibi alınır.
+          </li>
+          <li>
+            <b>İlk yıl net kazanç:</b> İlk yıl brüt kazanç − uygulama maliyeti.
+          </li>
+          <li>
+            <b>Geri dönüş süresi:</b> Uygulama maliyeti ÷ aylık kazanç (yalnız tekrarlayan kazançta); ay olarak, bir ondalıkla.
+          </li>
+          <li>
+            <b>Ödül:</b> Ödül açıksa, öneri tamamlanınca kurallar yukarıdan aşağı denenir; puanı ve varsa en az net kazanç şartını karşılayan ilk kural uygulanır, İK onaylar. Maaş bilgisi İvme'de tutulmaz.
+          </li>
+        </ul>
+      </details>
     </>
   );
 }
