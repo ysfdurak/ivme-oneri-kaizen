@@ -8811,3 +8811,25 @@ b.overdue {
     grid-template-columns: 1fr;
   }
 }
+
+/* Önerilerim: tek satırda son işlem, sıradaki sorumlu, bekleme; gerekçe aynı yerde */
+.my-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted, #5b6770);
+}
+.my-track b {
+  color: var(--ink, #1d2a31);
+  font-weight: 600;
+}
+.my-reason {
+  margin: 6px 0 0;
+  padding: 6px 10px;
+  border-left: 3px solid var(--warn, #b7791f);
+  background: var(--warn-bg, #fff6e5);
+  font-size: 13px;
+  border-radius: 4px;
+}

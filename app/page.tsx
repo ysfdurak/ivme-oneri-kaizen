@@ -290,6 +290,26 @@ function nextStep(p: Proposal, id: string) {
   const mine = p.owner === id;
   return { title: mine ? st[0] : st[1], tab: st[2], mine };
 }
+/** Öneri sahibine tek satırda: son işlem, sıradaki sorumlu, bu aşamada bekleme süresi.
+ * Düzeltme istenen, reddedilen ya da uygulanamayan öneride gerekçe de aynı yerde okunur. */
+function trackOf(p: Proposal) {
+  const hist = [...(p.history || [])].sort((a, b) => b.at.localeCompare(a.at));
+  const last = hist[0];
+  const after = (key: string) => {
+    const h = hist.find((x) => x.text.includes(key));
+    return h ? h.text.slice(h.text.indexOf(key) + key.length).trim() : "";
+  };
+  const closed = ["Tamamlandı", "Reddedildi", "İptal edildi", NOT_IMPLEMENTED].includes(p.status);
+  const days = Math.max(0, Math.floor((Date.now() - new Date(p.stageAt || p.created).getTime()) / 86400000));
+  let reason: { label: string; text: string } | null = null;
+  if (p.status === "Revizyon bekliyor") reason = { label: "Düzenleme gerekçesi:", text: after("Revizyon istendi:") };
+  else if (p.status === "Kazanç düzeltmesi bekliyor") reason = { label: "Düzeltme gerekçesi:", text: after("Kazanç düzeltmeye gönderildi:") };
+  else if (p.status === "Reddedildi") reason = { label: "Ret gerekçesi:", text: after("ret gerekçesi:") || p.rejectReason || "" };
+  else if (p.status === NOT_IMPLEMENTED && p.notImplemented)
+    reason = { label: "Uygulanamama nedeni:", text: [p.notImplemented.reason, p.notImplemented.note].filter(Boolean).join(" · ") };
+  if (reason && !reason.text) reason = null;
+  return { last, closed, days, reason };
+}
 /** Önerinin süreçte kaçıncı adımda olduğunu ve çalışana gösterilecek açıklamayı verir. */
 function progressOf(p: Proposal) {
   const i = STAGES.indexOf(p.status);
@@ -1597,6 +1617,40 @@ export default function App() {
                                 <Badge status={item.status} />
                                 <span>{prog.label}</span>
                               </div>
+                              {(() => {
+                                const tk = trackOf(item);
+                                return (
+                                  <>
+                                    <p className="my-track">
+                                      {tk.last && (
+                                        <span>
+                                          <b>Son işlem:</b>{" "}
+                                          {tk.last.text.length > 70 ? tk.last.text.slice(0, 70) + "…" : tk.last.text}
+                                          {" · "}
+                                          {who(tk.last.actor)}
+                                          {" · "}
+                                          {new Date(tk.last.at).toLocaleDateString(intlLocale())}
+                                        </span>
+                                      )}
+                                      {!tk.closed && (
+                                        <span>
+                                          <b>Sıradaki:</b> {item.owner === user.id ? "sen" : who(item.owner)}
+                                        </span>
+                                      )}
+                                      {!tk.closed && (
+                                        <span>
+                                          <b>Bekleme:</b> {tk.days === 0 ? "bugün başladı" : <>{tk.days} gün</>}
+                                        </span>
+                                      )}
+                                    </p>
+                                    {tk.reason && (
+                                      <p className="my-reason">
+                                        <b>{tk.reason.label}</b> {tk.reason.text}
+                                      </p>
+                                    )}
+                                  </>
+                                );
+                              })()}
                             </li>
                           );
                         })}

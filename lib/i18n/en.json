@@ -2145,5 +2145,14 @@
  "Yazılmadı": "Not written",
  "2 · Gerçekleşen (uygulama sonrası ölçüm)": "2 · Realised (measured after implementation)",
  "Henüz ölçülmedi": "Not measured yet",
- "3 · Onaylı (müdür)": "3 · Approved (manager)"
+ "3 · Onaylı (müdür)": "3 · Approved (manager)",
+ "Son işlem:": "Last action:",
+ "Sıradaki:": "Next:",
+ "Bekleme:": "Waiting:",
+ "sen": "you",
+ "bugün başladı": "started today",
+ "Düzenleme gerekçesi:": "Reason for edit request:",
+ "Düzeltme gerekçesi:": "Reason for correction:",
+ "Ret gerekçesi:": "Reason for rejection:",
+ "Uygulanamama nedeni:": "Why it could not be implemented:"
 }
