@@ -509,3 +509,8 @@ Tanımlar → **Eski önerileri aktar** (yalnız sistem yöneticisi). Ayrıntıl
 
 **Test:** `tests/round14.test.ts`: varsayılan ₺, yalnız yöneticinin değiştirebilmesi, geçersiz simgenin reddi, tutar/ödül/başlık metinlerinde yeni simge, İngilizce başlıklarda simge.
 
+## Önerilerim: takip satırı ve gerekçe (19 Kasım 2026)
+- **Ne var?** Çalışanın ana sayfadaki "Önerilerin nerede?" listesinde her öneri için tek satırda son işlem (kim, ne zaman), sıradaki sorumlu ("sen" ya da kişi adı) ve bu aşamadaki bekleme süresi. Düzenleme ya da kazanç düzeltmesi istenen, reddedilen ve uygulanamayan öneride gerekçe aynı kartta, tam listede (masaüstü tablo ve mobil kart) kısaltılmış hâliyle görünür.
+- **Kod:** `trackOf(p)` (app/page.tsx) geçmişten (`p.history`) son kaydı ve gerekçeyi çıkarır; gerekçe, iş akışının yazdığı metinlerden okunur: "Revizyon istendi: …", "Kazanç düzeltmeye gönderildi: …", "… ret gerekçesi: …" ve `p.notImplemented`. Bu metinler lib/workflow.ts'te değişirse `trackOf` da güncellenmeli. `ReasonLine` listedeki kısa gerekçedir.
+- **Neden?** Öneri sahibinin en sık sorusu "önerim nerede, kimde, ne kadar bekliyor?" ve reddedildiyse "neden?". Cevap ayrıntı sekmesine girmeden görünür.
+

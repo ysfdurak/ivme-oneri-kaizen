@@ -301,14 +301,24 @@ function trackOf(p: Proposal) {
   };
   const closed = ["Tamamlandı", "Reddedildi", "İptal edildi", NOT_IMPLEMENTED].includes(p.status);
   const days = Math.max(0, Math.floor((Date.now() - new Date(p.stageAt || p.created).getTime()) / 86400000));
-  let reason: { label: string; text: string } | null = null;
-  if (p.status === "Revizyon bekliyor") reason = { label: "Düzenleme gerekçesi:", text: after("Revizyon istendi:") };
-  else if (p.status === "Kazanç düzeltmesi bekliyor") reason = { label: "Düzeltme gerekçesi:", text: after("Kazanç düzeltmeye gönderildi:") };
-  else if (p.status === "Reddedildi") reason = { label: "Ret gerekçesi:", text: after("ret gerekçesi:") || p.rejectReason || "" };
+  let reason: { label: string; text: string; act: string } | null = null;
+  if (p.status === "Revizyon bekliyor") reason = { label: "Düzenleme gerekçesi:", text: after("Revizyon istendi:"), act: "Düzenleme istendi" };
+  else if (p.status === "Kazanç düzeltmesi bekliyor") reason = { label: "Düzeltme gerekçesi:", text: after("Kazanç düzeltmeye gönderildi:"), act: "Kazanç düzeltmeye gönderildi" };
+  else if (p.status === "Reddedildi") reason = { label: "Ret gerekçesi:", text: after("ret gerekçesi:") || p.rejectReason || "", act: "Reddedildi" };
   else if (p.status === NOT_IMPLEMENTED && p.notImplemented)
-    reason = { label: "Uygulanamama nedeni:", text: [p.notImplemented.reason, p.notImplemented.note].filter(Boolean).join(" · ") };
+    reason = { label: "Uygulanamama nedeni:", text: [p.notImplemented.reason, p.notImplemented.note].filter(Boolean).join(" · "), act: "Uygulanamadı olarak kapatıldı" };
   if (reason && !reason.text) reason = null;
   return { last, closed, days, reason };
+}
+/** Listede ret, düzeltme ya da uygulanamama gerekçesinin kısa hâli (tamamı başlıkta). */
+function ReasonLine({ p }: { p: Proposal }) {
+  const r = trackOf(p).reason;
+  if (!r) return null;
+  return (
+    <small className="list-reason" title={r.text}>
+      <b>{r.label}</b> {r.text.length > 70 ? r.text.slice(0, 70) + "…" : r.text}
+    </small>
+  );
 }
 /** Önerinin süreçte kaçıncı adımda olduğunu ve çalışana gösterilecek açıklamayı verir. */
 function progressOf(p: Proposal) {
@@ -1619,15 +1629,21 @@ export default function App() {
                               </div>
                               {(() => {
                                 const tk = trackOf(item);
+                                // Son işlem metni gerekçeyi içeriyorsa kısa adını yaz (gerekçe alttaki satırda);
+                                // metnin sonunda işlemi yapanın adı zaten varsa ikinci kez yazma.
+                                const actor = tk.last ? who(tk.last.actor) : "";
+                                let lastText = tk.last ? tk.last.text : "";
+                                if (tk.reason && lastText.includes(tk.reason.text)) lastText = tk.reason.act;
+                                if (actor && lastText.endsWith(" · " + actor)) lastText = lastText.slice(0, -(actor.length + 3));
                                 return (
                                   <>
                                     <p className="my-track">
                                       {tk.last && (
                                         <span>
                                           <b>Son işlem:</b>{" "}
-                                          {tk.last.text.length > 70 ? tk.last.text.slice(0, 70) + "…" : tk.last.text}
+                                          {lastText.length > 70 ? lastText.slice(0, 70) + "…" : lastText}
                                           {" · "}
-                                          {who(tk.last.actor)}
+                                          {actor}
                                           {" · "}
                                           {new Date(tk.last.at).toLocaleDateString(intlLocale())}
                                         </span>
@@ -6598,6 +6614,7 @@ export default function App() {
                   {waiting(item).join(", ")} bekleniyor
                 </div>
               )}
+              <ReasonLine p={item} />
               <button
                 className="mobile-card-action"
                 onClick={() => openWork(item)}
@@ -6712,6 +6729,7 @@ export default function App() {
                         <StageAge p={p} />
                       </small>
                     )}
+                    <ReasonLine p={p} />
                   </td>
                   <td>
                     {p.owner ? (
