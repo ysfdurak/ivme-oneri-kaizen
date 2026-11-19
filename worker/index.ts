@@ -13,18 +13,57 @@ function languageRedirect(request: Request): Response | null {
   const lang = localeFrom(url.searchParams.get("lang"));
   if (!url.searchParams.has("lang")) return null;
   url.searchParams.delete("lang");
-  const headers = new Headers({ Location: url.pathname + url.search + url.hash, "Cache-Control": "no-store" });
+  // "//kotu-site.com/?lang=en" gibi bir adreste pathname "//kotu-site.com/" olur ve tarayıcı
+  // Location'ı başka siteye giden adres sayar (açık yönlendirme). Baştaki eğik çizgiler teke indirilir.
+  const path = "/" + url.pathname.replace(/^[/\\]+/, "");
+  const headers = new Headers({ Location: path + url.search + url.hash, "Cache-Control": "no-store" });
   if (lang)
     headers.append("Set-Cookie", `${LANG_COOKIE}=${lang}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`);
   return new Response(null, { status: 302, headers });
 }
 
+// Worker'ın ürettiği her yanıta temel güvenlik başlıkları; statik dosyalar aynılarını
+// public/_headers ile alır. Uygulamanın kendi koyduğu başlığın üzerine yazılmaz.
+const GUVENLIK_BASLIKLARI: Record<string, string> = {
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "X-Frame-Options": "DENY",
+  "Content-Security-Policy": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+  "Cross-Origin-Opener-Policy": "same-origin",
+};
+function guvenlikBasliklari(response: Response): Response {
+  const out = new Response(response.body, response);
+  for (const [k, v] of Object.entries(GUVENLIK_BASLIKLARI)) if (!out.headers.has(k)) out.headers.set(k, v);
+  return out;
+}
+
 const worker = {
-  fetch(
+  async fetch(
     request: Request,
     env: Cloudflare.Env,
     ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>,
   ) {
+    return guvenlikBasliklari(await uygulama(request, env, ctx));
+  },
+  // Zamanlanmış görev (wrangler.jsonc → triggers.crons): vitrin demosunda her gece veriyi sıfırlar.
+  async scheduled(
+    _event: ScheduledController,
+    env: Cloudflare.Env,
+    ctx: ExecutionContext,
+  ) {
+    serverLocale(env);
+    if (String((env as any).IVME_VITRIN ?? "0") !== "1") return;
+    const { resetShowcase } = await import("../lib/vitrin");
+    ctx.waitUntil(resetShowcase());
+  },
+};
+
+async function uygulama(
+  request: Request,
+  env: Cloudflare.Env,
+  ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>,
+) {
     serverLocale(env);
     const redirect = languageRedirect(request);
     if (redirect) return redirect;
@@ -54,18 +93,6 @@ const worker = {
     return runWithConnectorBinding(binding, () =>
       handler.fetch(request, env, ctx),
     );
-  },
-  // Zamanlanmış görev (wrangler.jsonc → triggers.crons): vitrin demosunda her gece veriyi sıfırlar.
-  async scheduled(
-    _event: ScheduledController,
-    env: Cloudflare.Env,
-    ctx: ExecutionContext,
-  ) {
-    serverLocale(env);
-    if (String((env as any).IVME_VITRIN ?? "0") !== "1") return;
-    const { resetShowcase } = await import("../lib/vitrin");
-    ctx.waitUntil(resetShowcase());
-  },
-};
+}
 
 export default worker;
