@@ -16,6 +16,7 @@ import {
   NOT_IMPLEMENTED,
   NOT_IMPLEMENTED_REASONS,
   CURRENCIES,
+  ANON_LABEL,
 } from "./model";
 import { REPORT_IDS, REPORTS } from "./dashboard";
 import {
@@ -55,8 +56,13 @@ export function applyCommand(s: State, b: any, u: User, us: User[]) {
     );
   const audit = (text: string) =>
     s.audit.unshift({ at: now, actor: u.id, text });
+  // Anonim öneride geçmiş metnine önerenin adı yazılmaz (devir, yönlendirme gibi ad içeren kayıtlar).
+  const anonText = (p: Proposal, text: string) => {
+    const n = p.anonymous ? us.find((x) => x.id === p.author)?.name : "";
+    return n ? text.split(n).join(ANON_LABEL) : text;
+  };
   const log = (p: Proposal, text: string) => {
-    p.history.unshift({ at: now, actor: u.id, text });
+    p.history.unshift({ at: now, actor: u.id, text: anonText(p, text) });
     (p as any)._touched = true; // Komut yolu bu işaretle kaydın sürümünü (rev) günceller.
   };
   const nameOf = (id?: string) =>
@@ -119,8 +125,7 @@ export function applyCommand(s: State, b: any, u: User, us: User[]) {
         p.history.unshift({
           at: now,
           actor: u.id,
-          text:
-            nameOf(id) +
+          text: (p.anonymous && id === p.author ? ANON_LABEL : nameOf(id)) +
             " pasif olduğu için iş " +
             nameOf(fallback) +
             " kişisine yönlendirildi.",

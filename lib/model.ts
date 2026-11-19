@@ -392,17 +392,22 @@ export type Transfer = {
 
 /** Anonim önerilerde istemciye giden kayıtta önerenin yerine geçen değer. */
 export const ANON = "anonim";
+/** Anonim önerinin geçmiş metinlerinde önerenin adı yerine yazılan ifade. */
+export const ANON_LABEL = "Öneren (anonim)";
 /** Anonim öneriyi öneren dışındaki bir görüntüleyici için gizler: önerenin kimliği geçen her alan ANON olur.
  * Yetki kontrolleri sunucuda gerçek kayıt üzerinde yapılır; bu yalnızca dışarı giden kopyayı değiştirir. */
-export function redactProposal<T extends Proposal>(p: T, viewerId: string): T {
+export function redactProposal<T extends Proposal>(p: T, viewerId: string, authorName?: string): T {
   if (!p.anonymous || p.author === viewerId) return p;
   const a = p.author;
   const r = (id: any) => (id === a ? ANON : id);
+  // Geçmiş metinleri de önerenin adını taşıyabilir (ör. eski kayıtlarda "Kullanıcı devri: Ad → …"); ad varsa metinden de silinir.
+  const scrub = (t: any) =>
+    authorName && typeof t === "string" ? t.split(authorName).join(ANON_LABEL) : t;
   return {
     ...p,
     author: ANON,
     owner: r(p.owner),
-    history: (p.history || []).map((h: any) => ({ ...h, actor: r(h.actor) })),
+    history: (p.history || []).map((h: any) => ({ ...h, actor: r(h.actor), text: scrub(h.text) })),
     comments: p.comments?.map((c) => ({ ...c, actor: r(c.actor) })),
     actions: (p.actions || []).map((x: any) => ({ ...x, owner: r(x.owner) })),
     support: (p.support || []).map((x: any) => ({ ...x, owner: r(x.owner) })),

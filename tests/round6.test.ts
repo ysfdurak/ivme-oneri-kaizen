@@ -197,6 +197,21 @@ assert.equal(redactProposal(pb, pb.owner).comments![0].actor, ANON);
 call({ action: "revision", id: b, reason: "Hangi raflar?" }, by(pb.owner));
 assert.equal(pb.owner, "calisan");
 assert.equal(redactProposal(pb, "admin").owner, ANON);
+// Önerenin işleri devredilince (ör. işten ayrıldı) geçmiş metninde adı yazılmaz; eski kayıtlarda ad varsa
+// istemciye giden kopyada metinden de silinir. Ayrı bir kopya üzerinde denenir, ana akış etkilenmez.
+{
+  const s2 = structuredClone(s);
+  const name = by("calisan").name;
+  const to = users.find((x) => x.id !== "calisan" && x.role !== "admin" && x.active !== 0)!.id;
+  applyCommand(s2, { action: "reassignUser", from: "calisan", to, reason: "İşten ayrıldı" }, by("admin"), users);
+  const p2 = s2.proposals.find((p: any) => p.id === b)!;
+  assert.ok(p2.history.some((h: any) => h.text.startsWith("Kullanıcı devri")), "devir kaydı yazıldı");
+  assert.ok(p2.history.every((h: any) => !h.text.includes(name)), "devir metninde önerenin adı yok");
+  // Eski kayıt: ad metne yazılmış olsa bile istemciye giden kopyada görünmez; önerenin kendisi görür.
+  p2.history.unshift({ at: new Date().toISOString(), actor: "admin", text: "Kullanıcı devri: " + name + " → X" });
+  assert.ok(redactProposal(p2, to, name).history.every((h: any) => !h.text.includes(name)), "eski metin de temizlenir");
+  assert.ok(redactProposal(p2, "calisan", name).history.some((h: any) => h.text.includes(name)), "önerene açık");
+}
 call(
   {
     action: "resubmit",

@@ -61,7 +61,7 @@ export async function GET(req: Request) {
     )
     .map((p: any) => ({
       // Anonim önerilerde önerenin kimliği yalnızca önerenin kendisine gider.
-      ...redactProposal(p, u.id),
+      ...redactProposal(p, u.id, allUsers.find((x: any) => x.id === p.author)?.name),
       attachments: (p.attachments || []).map((a: any, i: number) => ({
         index: i,
         name: a.name,

@@ -514,3 +514,7 @@ Tanımlar → **Eski önerileri aktar** (yalnız sistem yöneticisi). Ayrıntıl
 - **Kod:** `trackOf(p)` (app/page.tsx) geçmişten (`p.history`) son kaydı ve gerekçeyi çıkarır; gerekçe, iş akışının yazdığı metinlerden okunur: "Revizyon istendi: …", "Kazanç düzeltmeye gönderildi: …", "… ret gerekçesi: …" ve `p.notImplemented`. Bu metinler lib/workflow.ts'te değişirse `trackOf` da güncellenmeli. `ReasonLine` listedeki kısa gerekçedir.
 - **Neden?** Öneri sahibinin en sık sorusu "önerim nerede, kimde, ne kadar bekliyor?" ve reddedildiyse "neden?". Cevap ayrıntı sekmesine girmeden görünür.
 
+## Anonim öneri: geçmiş metinlerinde ad (19 Kasım 2026)
+- **Sorun:** `redactProposal` kimlik alanlarını (`author`, `owner`, `actor`) gizliyordu ama geçmiş **metinlerini** değiştirmiyordu. Anonim önerinin sahibi işten ayrılıp işleri devredildiğinde ("Kullanıcı devri: Ad → …"), pasife alındığında ya da öneri revizyondayken yönlendirildiğinde, önerenin adı geçmiş sekmesinde başkalarına görünüyordu. Sentetik kayıtla doğrulandı (`tests/round6.test.ts`: eski kodda test düşer).
+- **Düzeltme:** (1) Yazarken: `applyCommand` içindeki `log` ve pasif yönlendirme kaydı, anonim öneride önerenin adını "Öneren (anonim)" yazar. (2) Okurken: `redactProposal(p, izleyici, önerenAdı)` eski kayıtlardaki adı da metinden siler; `/api/state` ve MCP araçları adı verir. Önerenin kendisi kendi kaydını olduğu gibi görür.
+

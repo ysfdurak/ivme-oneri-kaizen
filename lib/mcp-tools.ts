@@ -137,7 +137,7 @@ export async function runTool(
   const ctx = { users, matrix: state.matrix, org: state.settings?.org };
   const visible = state.proposals
     .filter((p) => canSee(p, viewer as any, ctx))
-    .map((p) => redactProposal(p, viewer.id));
+    .map((p) => redactProposal(p, viewer.id, users.find((x) => x.id === p.author)?.name));
   const name_ = (id?: string) =>
     id === ANON
       ? "Anonim çalışan"
