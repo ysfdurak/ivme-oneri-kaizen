@@ -48,6 +48,14 @@ export async function password(s: string, salt = crypto.randomUUID()) {
       .join("")
   );
 }
+/** Şirket kurulumunda ilk yönetici şifresi (IVME_ILK_SIFRE) tanımlanmamış. */
+export class SetupError extends Error {
+  constructor() {
+    super(
+      "Kurulum tamamlanmamış: şirket kurulumunda (IVME_DEMO=0) ilk yönetici şifresi gerekir. Cloudflare'de en az 12 karakterlik IVME_ILK_SIFRE gizli değerini tanımlayın (npx wrangler secret put IVME_ILK_SIFRE), sonra sayfayı yenileyin.",
+    );
+  }
+}
 let baseReady = false;
 /** Boş bir D1 veritabanında temel tabloları kurar (drizzle/0000 göçüyle aynı yapı).
  * Böylece ilk yayında ayrıca "migrations apply" çalıştırmak gerekmez. */
@@ -80,7 +88,14 @@ export async function seed() {
     const { resetShowcase } = await import("./vitrin");
     return void (await resetShowcase());
   }
-  const pass = await password("Kaizen123!");
+  // Şirket kurulumunda (IVME_DEMO=0) herkesçe bilinen başlangıç şifresi kullanılmaz: yönetici şifresi
+  // Cloudflare gizli değeri IVME_ILK_SIFRE'den gelir (ilk girişte yine değiştirilir), örnek kişiler
+  // hiçbir şifreyle girilemeyen bir değerle kilitli oluşur; yönetici gerekirse Kullanıcılar ekranından sıfırlar.
+  const company = !demoMode();
+  const first = String((env as any).IVME_ILK_SIFRE ?? "");
+  if (company && (first.length < 12 || first === "Kaizen123!")) throw new SetupError();
+  const pass = company ? await password(first) : await password("Kaizen123!");
+  const passFor = (id: string) => (!company || id === "admin" ? pass : "kilitli:" + crypto.randomUUID());
   await db().batch([
     ...DEMO_USERS.map((u) =>
       db()
@@ -95,7 +110,7 @@ export async function seed() {
           "Lojistik Müdürlüğü",
           u.role,
           u.manager,
-          pass,
+          passFor(u.id),
         ),
     ),
     db()

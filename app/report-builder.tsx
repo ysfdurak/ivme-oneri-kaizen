@@ -26,6 +26,7 @@ import {
   presets,
   runReport,
 } from "../lib/report-builder";
+import { csvSafe } from "../lib/csv-cell";
 
 type Props = {
   proposals: Proposal[];
@@ -53,9 +54,8 @@ function csv(name: string, rows: (string | number)[][]) {
           .map(
             (x) =>
               '"' +
-              translate(String(x ?? ""))
-                .replace(/"/g, '""')
-                .replace(/^[=+@-]/, "'") +
+              csvSafe(translate(String(x ?? "")))
+                .replace(/"/g, '""') +
               '"',
           )
           .join(";"),

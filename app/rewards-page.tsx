@@ -8,6 +8,7 @@ import { Download, Gift } from "lucide-react";
 import type { Proposal, User } from "../lib/model";
 import { currency, gainFigures } from "../lib/model";
 import { REWARD_STATUSES, Reward, rewardText } from "../lib/rewards";
+import { csvSafe } from "../lib/csv-cell";
 
 type Props = {
   rewards: Reward[];
@@ -32,9 +33,8 @@ function download(name: string, rows: (string | number)[][]) {
           .map(
             (x) =>
               '"' +
-              translate(String(x ?? ""))
-                .replace(/"/g, '""')
-                .replace(/^[=+@-]/, "'") +
+              csvSafe(translate(String(x ?? "")))
+                .replace(/"/g, '""') +
               '"',
           )
           .join(";"),

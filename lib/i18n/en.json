@@ -2175,5 +2175,6 @@
  "Onay notu (isteğe bağlı)": "Approval note (optional)",
  "Onay notu (isteğe bağlı): hangi kaynakla doğrulandı?": "Approval note (optional): what source verified it?",
  "Kazanç onaylandı{0}": "Gain approved{0}",
- "Kazanç onaylandı": "Gain approved"
+ "Kazanç onaylandı": "Gain approved",
+ "Kurulum tamamlanmamış: şirket kurulumunda (IVME_DEMO=0) ilk yönetici şifresi gerekir. Cloudflare'de en az 12 karakterlik IVME_ILK_SIFRE gizli değerini tanımlayın (npx wrangler secret put IVME_ILK_SIFRE), sonra sayfayı yenileyin.": "Setup is not complete: a company installation (IVME_DEMO=0) needs an initial administrator password. Define the IVME_ILK_SIFRE secret in Cloudflare (at least 12 characters: npx wrangler secret put IVME_ILK_SIFRE), then reload the page."
 }

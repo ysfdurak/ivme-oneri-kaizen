@@ -1,5 +1,6 @@
 // İvme · Cloudflare Workers yayın ayarları (ivme.ysfdurak.com canlı demosu).
-// Şirket kurulumunda: IVME_VITRIN "0" yapılır (ya da satır silinir), "name" ve veritabanı adı değiştirilir,
+// Şirket kurulumunda: IVME_VITRIN "0" ve IVME_DEMO "0" yapılır, ilk yönetici şifresi gizli değer olarak verilir
+// (npx wrangler secret put IVME_ILK_SIFRE, en az 12 karakter), "name" ve veritabanı adı değiştirilir,
 // e-posta için EMAIL_PROVIDER ve ilgili gizli anahtarlar Cloudflare panelinden eklenir (docs/MCP_REHBERI.md, README).
 {
   "$schema": "node_modules/wrangler/config-schema.json",

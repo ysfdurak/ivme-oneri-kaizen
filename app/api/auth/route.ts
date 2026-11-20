@@ -12,6 +12,7 @@ import {
   edition,
   showcase,
   visitorScope,
+  SetupError,
   scopeCookie,
 } from "../../../lib/server";
 import { SHOWCASE_ROLES, SHOWCASE_USERNAMES, ensureVisitorWorkspace } from "../../../lib/vitrin";
@@ -37,7 +38,8 @@ export async function GET(req: Request) {
       edition: edition(),
       ...(showcase() ? { showcase: SHOWCASE_ROLES, altDemo: altDemo() } : {}),
     });
-  } catch {
+  } catch (e) {
+    if (e instanceof SetupError) return json({ error: e.message }, 503);
     return json({ error: "Veri tabanına erişilemiyor." }, 503);
   }
 }
@@ -158,7 +160,8 @@ export async function POST(req: Request) {
       .bind(await hash(token), u.id, Date.now() + 43200000)
       .run();
     return json({ user: publicUser(u) }, 200, { "Set-Cookie": cookie(token) });
-  } catch {
+  } catch (e) {
+    if (e instanceof SetupError) return json({ error: e.message }, 503);
     return json({ error: "İşlem tamamlanamadı. Tekrar deneyin." }, 500);
   }
 }

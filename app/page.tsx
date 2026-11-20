@@ -96,6 +96,7 @@ import ReportBuilder from "./report-builder";
 import { DemoGuide } from "./demo-guide";
 import { pickRule, rewardText } from "../lib/rewards";
 import { REPORTS } from "../lib/dashboard";
+import { csvSafe } from "../lib/csv-cell";
 const NAV = [
   ["overview", "Çalışma merkezim", LayoutDashboard],
   ["list", "Öneriler", Lightbulb],
@@ -607,7 +608,7 @@ export default function App() {
       .then((r) => r.json())
       .then((b: any) => {
         setUser(b.user);
-        setDemo(b.demo !== false);
+        setDemo(!b.error && b.demo !== false);
         setShowcase(Array.isArray(b.showcase) ? b.showcase : null);
         setEdition(b.edition === "ai" ? "ai" : "surec");
         setAltDemo(b.altDemo && typeof b.altDemo.url === "string" ? b.altDemo : null);
@@ -1021,9 +1022,8 @@ export default function App() {
             .map(
               (x) =>
                 '"' +
-                translate(String(x ?? ""))
-                  .replace(/"/g, '""')
-                  .replace(/^[=+@-]/, "'") +
+                csvSafe(translate(String(x ?? "")))
+                .replace(/"/g, '""') +
                 '"',
             )
             .join(";"),

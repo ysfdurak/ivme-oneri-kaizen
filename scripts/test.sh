@@ -4,6 +4,7 @@ set -e
 cd "$(dirname "$0")/.."
 TSX=$(ls node_modules/.pnpm/tsx@*/node_modules/tsx/dist/cli.mjs | head -1)
 node "$TSX" tests/workflow.test.ts
+node "$TSX" tests/csv.test.ts
 node "$TSX" tests/improvements.test.ts
 node "$TSX" tests/dashboard.test.ts
 node "$TSX" tests/round3.test.ts
