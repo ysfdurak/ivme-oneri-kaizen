@@ -11,7 +11,6 @@ import {
   demoMode,
   edition,
   showcase,
-  olcumAdresi,
   visitorScope,
   SetupError,
   scopeCookie,
@@ -37,8 +36,7 @@ export async function GET(req: Request) {
       user: user ? publicUser(user) : null,
       demo: demoMode(),
       edition: edition(),
-      // Anonim ölçüm adresi yalnız vitrinde verilir (lib/olcum.ts); şirket kurulumunda dışarıya istek gitmez.
-      ...(showcase() ? { showcase: SHOWCASE_ROLES, altDemo: altDemo(), olcum: olcumAdresi() } : {}),
+      ...(showcase() ? { showcase: SHOWCASE_ROLES, altDemo: altDemo() } : {}),
     });
   } catch (e) {
     if (e instanceof SetupError) return json({ error: e.message }, 503);

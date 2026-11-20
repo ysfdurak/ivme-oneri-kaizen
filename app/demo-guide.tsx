@@ -115,12 +115,9 @@ const TIPS: Record<string, { title: string; tips: Tip[] }> = {
 export function DemoGuide({
   role,
   onNavigate,
-  feedback,
 }: {
   role: string;
   onNavigate: (page: string) => void;
-  /** Yalnız vitrinde, anonim ölçüm açıkken verilir (lib/olcum.ts). */
-  feedback?: (puan: number | null, metin: string) => Promise<boolean>;
 }) {
   const key = "ivme-demo-guide-closed-" + role;
   // Bileşen yalnız giriş sonrası istemcide çizilir; tercihi ilk çizimde okumak yeterli.
@@ -166,7 +163,6 @@ export function DemoGuide({
           ))}
         </ol>
         <small>Veriler her gece sıfırlanır; istediğin gibi dene.</small>
-        {feedback && <DemoFeedback send={feedback} />}
       </div>
       <button
         type="button"
@@ -177,52 +173,5 @@ export function DemoGuide({
         <X size={18} />
       </button>
     </section>
-  );
-}
-
-/** "Bu demo işine yaradı mı?" 1-5 puan ve isteğe bağlı kısa not. Ad, e-posta istenmez; sunucu e-posta/telefonu maskeler. */
-function DemoFeedback({ send }: { send: (puan: number | null, metin: string) => Promise<boolean> }) {
-  const [puan, setPuan] = useState<number | null>(null);
-  const [metin, setMetin] = useState("");
-  const [durum, setDurum] = useState<"" | "gidiyor" | "tamam" | "hata">("");
-  if (durum === "tamam") return <p className="demo-feedback-thanks">Teşekkürler, geri bildirimin alındı.</p>;
-  return (
-    <form
-      className="demo-feedback"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        if (puan === null && metin.trim().length < 2) return;
-        setDurum("gidiyor");
-        setDurum((await send(puan, metin.trim())) ? "tamam" : "hata");
-      }}
-    >
-      <span id="demo-feedback-q">Bu demo işine yaradı mı?</span>
-      <div role="radiogroup" aria-labelledby="demo-feedback-q" className="demo-feedback-scale">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button
-            key={n}
-            type="button"
-            role="radio"
-            aria-checked={puan === n}
-            className={puan === n ? "on" : ""}
-            onClick={() => setPuan(n)}
-          >
-            {n}
-          </button>
-        ))}
-      </div>
-      <input
-        aria-label="Kısa not (isteğe bağlı)"
-        placeholder="Kısa not (isteğe bağlı, adını yazma)"
-        maxLength={500}
-        value={metin}
-        onChange={(e) => setMetin(e.target.value)}
-      />
-      <button type="submit" className="demo-guide-link" disabled={durum === "gidiyor" || (puan === null && metin.trim().length < 2)}>
-        Gönder
-      </button>
-      {durum === "hata" && <small role="alert">Gönderilemedi, sonra tekrar dene.</small>}
-      <small className="demo-feedback-note">Anonim: çerez, ad ya da IP tutulmaz.</small>
-    </form>
   );
 }

@@ -45,8 +45,3 @@ Köşeli parantezli yerleri doldur.
 
 ---
 Son güncelleme: 19 Kasım 2026.
-
-## Canlı vitrin ve anonim ölçüm (20 Kasım 2026)
-
-Bu yalnızca herkese açık tanıtım adresini (ivme.ysfdurak.com) ilgilendirir. Vitrinde ekran açılışları ve demo işlemleri anonim olarak **sayılır**; isteğe bağlı 1-5 puanlı geri bildirim alınır. Kişi, öneri içeriği, çerez ve IP saklanmaz, bu yüzden kişisel veri işlenmez. Şirket kurulumunda bu özellik kodda kapalıdır: tarayıcı güvenlik politikası (CSP) uygulamanın kendi adresi dışında bağlantıya izin vermez. Ayrıntı: `docs/IYILESTIRME_NOTLARI.md` → "Vitrinde anonim ölçüm".
-

@@ -193,11 +193,6 @@ export function cookie(token: string, age = 43200) {
 export function showcase() {
   return String((env as any).IVME_VITRIN ?? "0") === "1";
 }
-/** Vitrinde anonim ölçüm servisinin adresi (IVME_OLCUM_URL ile değiştirilebilir, "0" kapatır). */
-export function olcumAdresi() {
-  const v = String((env as any).IVME_OLCUM_URL ?? "https://olcum.ysfdurak.com");
-  return showcase() && v !== "0" ? v : null;
-}
 export function demoMode() {
   if (showcase()) return false;
   return String((env as any).IVME_DEMO ?? "1") !== "0";
