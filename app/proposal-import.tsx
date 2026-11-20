@@ -131,8 +131,9 @@ export default function ProposalImport({
     if (!f) return;
     try {
       if (/\.xlsx$/i.test(f.name)) {
-        const { default: readXlsx } = await import("read-excel-file");
-        load((await readXlsx(f)) as any[][]);
+        // read-excel-file 9: varsayılan dışa aktarım yok; readSheet ilk sayfanın satırlarını döndürür.
+        const { readSheet } = await import("read-excel-file/browser");
+        load((await readSheet(f)) as any[][]);
       } else load(parseText(await f.text()));
     } catch {
       setError("Dosya okunamadı. .xlsx ya da .csv kaydedip tekrar deneyin.");
