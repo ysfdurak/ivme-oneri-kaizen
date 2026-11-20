@@ -116,6 +116,12 @@ export type Proposal = {
   campaign?: string;
   /** Öneri alt sınıfı (sınıfın alt sınıfı tanımlıysa). */
   subcategory?: string;
+  /** Fikri destekleyen çalışanlar (kullanıcı id). Kimlikler istemciye gitmez; yalnızca sayı ve
+   * görüntüleyenin destekleyip desteklemediği gider (endorseView). */
+  endorsements?: string[];
+  /** Yalnızca istemciye giden kopyada: destek sayısı ve görüntüleyen destekledi mi. */
+  endorseCount?: number;
+  endorsedByMe?: boolean;
   /** Uygulanamadı kapanışının nedeni (NOT_IMPLEMENTED_REASONS) ve açıklaması. */
   notImplemented?: { reason: string; note: string; at: string; by: string };
   /** Eski sistemden toplu aktarımla gelen kayıt: eski numara ve aktarım bilgisi. */
@@ -413,6 +419,20 @@ export function redactProposal<T extends Proposal>(p: T, viewerId: string, autho
     support: (p.support || []).map((x: any) => ({ ...x, owner: r(x.owner) })),
   };
 }
+
+/** Destek bilgisini dışarı giden kopya için gizler: kimlik listesi silinir, sayı ve "ben destekledim mi" kalır.
+ * Destek gizli oy gibidir; öneren, değerlendirici ve yönetici kimin desteklediğini görmez. */
+export function endorseView<T extends Proposal>(p: T, viewerId: string): T {
+  const list = p.endorsements || [];
+  const { endorsements: _gizli, ...rest } = p;
+  void _gizli;
+  return { ...(rest as T), endorseCount: list.length, endorsedByMe: list.includes(viewerId) };
+}
+/** Bir kullanıcının öneriyi destekleyip destekleyemeyeceği: açık öneri, kendi (ya da ortak) önerisi değil. */
+export const canEndorse = (p: Proposal, userId: string) =>
+  !CLOSED.includes(p.status) &&
+  p.author !== userId &&
+  !(p.coAuthors || []).includes(userId);
 
 export type Campaign = {
   id: string;

@@ -1,5 +1,5 @@
 import { current, db, json, users, sameOrigin, wsId } from "../../../lib/server";
-import { canSee } from "../../../lib/model";
+import { canEndorse, canSee } from "../../../lib/model";
 import { migrateState } from "../../../lib/migrate";
 import { findSimilarSafe } from "../../../lib/similarity";
 /** Benzer öneriler.
@@ -34,6 +34,10 @@ async function run(req: Request, input: any) {
       shared: h.shared,
       sameOperation: h.sameOperation,
       canOpen: canSee(h.proposal, u, ctx),
+      // Destek: kimlik değil, yalnızca sayı ve görüntüleyenin kendi durumu.
+      endorseCount: (h.proposal.endorsements || []).length,
+      endorsedByMe: (h.proposal.endorsements || []).includes(u.id),
+      canEndorse: canEndorse(h.proposal, u.id),
     })),
   });
 }

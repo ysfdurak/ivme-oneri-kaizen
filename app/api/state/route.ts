@@ -1,5 +1,5 @@
 import { current, db, json, users, wsId } from "../../../lib/server";
-import { canSee, redactProposal } from "../../../lib/model";
+import { canSee, endorseView, redactProposal } from "../../../lib/model";
 import { migrateState } from "../../../lib/migrate";
 import { tick } from "../../../lib/outbox";
 import { env } from "cloudflare:workers";
@@ -61,7 +61,7 @@ export async function GET(req: Request) {
     )
     .map((p: any) => ({
       // Anonim önerilerde önerenin kimliği yalnızca önerenin kendisine gider.
-      ...redactProposal(p, u.id, allUsers.find((x: any) => x.id === p.author)?.name),
+      ...endorseView(redactProposal(p, u.id, allUsers.find((x: any) => x.id === p.author)?.name), u.id),
       attachments: (p.attachments || []).map((a: any, i: number) => ({
         index: i,
         name: a.name,

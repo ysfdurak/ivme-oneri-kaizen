@@ -1186,6 +1186,20 @@ export function applyCommand(s: State, b: any, u: User, us: User[]) {
     return;
   }
   assert(!CLOSED.includes(p.status), "Kapalı kayıtta işlem yapılamaz.");
+  if (b.action === "endorse") {
+    // Fikre destek: görme yetkisi gerekmez (çalışan, benzer öneri uyarısında başkasının fikrini görür ve
+    // aynısını yeniden göndermek yerine destekleyebilir). Kimlik dışarı verilmez; geçmişe yazılmaz.
+    assert(
+      p.author !== u.id && !(p.coAuthors || []).includes(u.id),
+      "Kendi önerini destekleyemezsin.",
+    );
+    const list = new Set(p.endorsements || []);
+    if (b.on === false) list.delete(u.id);
+    else list.add(u.id);
+    p.endorsements = Array.from(list);
+    (p as any)._touched = true;
+    return;
+  }
   if (b.action === "forward") {
     assert(responsible, "Yönlendirme yetkiniz yok.");
     assert(

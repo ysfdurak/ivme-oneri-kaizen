@@ -19,6 +19,7 @@ node "$TSX" tests/round12.test.ts
 node "$TSX" tests/vitrin.test.ts
 node "$TSX" tests/i18n.test.ts
 node "$TSX" tests/round14.test.ts
+node "$TSX" tests/round15.test.ts
 node "$TSX" tests/audit.test.ts
 rm -rf /tmp/kaizen-server-tests
 node_modules/.bin/tsc lib/*.ts app/api/*/route.ts --outDir /tmp/kaizen-server-tests --module commonjs --target es2022 --moduleResolution node --skipLibCheck --esModuleInterop --types @cloudflare/workers-types,node >/dev/null || true

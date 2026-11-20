@@ -40,6 +40,7 @@ import {
   Settings2,
   FileText,
   TrendingUp,
+  ThumbsUp,
   LoaderCircle,
   MessageSquare,
   Bell,
@@ -71,6 +72,7 @@ import {
   supportWaitText,
   age,
   setCurrency,
+  canEndorse,
 } from "../lib/model";
 import DashboardPage from "./dashboard-page";
 import LanguageSwitch from "./language-switch";
@@ -759,6 +761,15 @@ export default function App() {
     } finally {
       setBusy(false);
     }
+  }
+  /** Benzer öneri listesinden fikre destek: başarılıysa panel kendi satırını günceller. */
+  async function endorseSimilar(id: string, on: boolean) {
+    const b = await command(
+      { action: "endorse", id, on },
+      false,
+      on ? "Bu fikri desteklediğin kaydedildi." : "Desteğin geri alındı.",
+    );
+    return !!b;
   }
   function open(type: string, data: any = {}) {
     setError("");
@@ -2922,6 +2933,7 @@ export default function App() {
                               operation: form.operation,
                               category: form.category,
                             }}
+                            onEndorse={endorseSimilar}
                           />
                         </>
                       )}
@@ -3689,6 +3701,35 @@ export default function App() {
                         <b>{p.location}</b>
                       </div>
                     )}
+                    <div className="endorse-meta">
+                      <small>Fikre destek</small>
+                      <b>
+                        <ThumbsUp size={14} aria-hidden="true" />{" "}
+                        {p.endorseCount || 0} kişi destekliyor
+                      </b>
+                      {canEndorse(p, user.id) && (
+                        <button
+                          type="button"
+                          className={
+                            "text-button endorse-button" +
+                            (p.endorsedByMe ? " on" : "")
+                          }
+                          aria-pressed={!!p.endorsedByMe}
+                          disabled={busy}
+                          onClick={() =>
+                            command(
+                              { action: "endorse", id: p.id, on: !p.endorsedByMe },
+                              false,
+                              p.endorsedByMe
+                                ? "Desteğin geri alındı."
+                                : "Bu fikri desteklediğin kaydedildi.",
+                            )
+                          }
+                        >
+                          {p.endorsedByMe ? "Desteği geri al" : "Bu fikri destekliyorum"}
+                        </button>
+                      )}
+                    </div>
                     {(state?.rewards || [])
                       .filter(
                         (r) =>
@@ -3806,6 +3847,7 @@ export default function App() {
                       <SimilarPanel
                         id={p.id}
                         onOpen={(id) => selectDetail(id)}
+                        onEndorse={endorseSimilar}
                         onDuplicate={
                           p.owner === user.id || admin || manager
                             ? (x) =>

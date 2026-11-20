@@ -31,7 +31,7 @@ Kâğıt formlarda ya da e-posta zincirlerinde yürüyen öneri sistemlerinde ö
 - **Kazanç ve puan:** parasal ve parasal olmayan kazanç, uygulama maliyeti ve net kazanç tutulur. Puanlama kriterleri ağırlıklı ve kuruma göre tanımlanır.
 - **Ödül:** puanlamadan sonra kurallara göre ödül önerisi otomatik oluşur (ör. 0,5 maaş ya da sabit tutar). İK onaylar ve ödendi olarak işaretler. Maaş bilgisi tutulmaz.
 - **Raporlar:** durum panosu, katılım istatistikleri (hiç öneri vermeyen, 5 ve üzeri öneri veren, en çok öneri veren ilk N kişi) ve yıl/ay filtreli, istenen ölçüyle rapor oluşturucu.
-- **Katılımı artıranlar:** anonim öneri, kampanyalar, önce/sonra fotoğrafı, benzer öneri uyarısı, tanınma ekranı, QR ile doğrudan öneri.
+- **Katılımı artıranlar:** anonim öneri, kampanyalar, önce/sonra fotoğrafı, benzer öneri uyarısı ve fikre destek (gizli oy gibi: yalnızca sayı görünür), tanınma ekranı, QR ile doğrudan öneri.
 - **Kuruma uyarlama:** öneri sınıfları, ret ve uygulanamama nedenleri, kazanç türleri, puan kriterleri, hedef süreler, bildirim kuralları ve para birimi (varsayılan Türk lirası; avro, dolar, sterlin) Tanımlar ekranından yönetilir.
 - **Geçiş:** kullanıcılar ve eski öneriler Excel ile aktarılır. Aktarım önce kontrol edilir; sonradan geri alınabilir.
 - **Erişilebilirlik:** klavye ile kullanım ve ekran okuyucu etiketleri. Ekranlar axe ile taranmıştır.

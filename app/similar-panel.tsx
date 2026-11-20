@@ -2,7 +2,7 @@
 // Benzer öneriler listesi: ön değerlendirmede önerinin altında ve çalışan gönderim öncesinde gösterilir.
 // Uyarı amaçlıdır; gönderimi ya da değerlendirmeyi durdurmaz. Mükerrer kararını insan verir.
 import React, { useEffect, useState } from "react";
-import { Copy, ExternalLink, Layers } from "lucide-react";
+import { Copy, ExternalLink, Layers, ThumbsUp } from "lucide-react";
 
 export type SimilarItem = {
   id: string;
@@ -14,6 +14,10 @@ export type SimilarItem = {
   shared: string[];
   sameOperation: boolean;
   canOpen: boolean;
+  /** Fikre destek: yalnızca sayı ve görüntüleyenin kendi durumu gelir (kimlik gelmez). */
+  endorseCount?: number;
+  endorsedByMe?: boolean;
+  canEndorse?: boolean;
 };
 
 type Props = {
@@ -22,12 +26,30 @@ type Props = {
   draft?: { title: string; problem: string; solution: string; operation: string; category: string };
   onOpen?: (id: string) => void;
   onDuplicate?: (item: SimilarItem) => void;
+  /** Fikre destek ver / geri al; başarılıysa true döner. */
+  onEndorse?: (id: string, on: boolean) => Promise<boolean>;
   compact?: boolean;
 };
 
-export default function SimilarPanel({ id, draft, onOpen, onDuplicate, compact }: Props) {
+export default function SimilarPanel({ id, draft, onOpen, onDuplicate, onEndorse, compact }: Props) {
   const [items, setItems] = useState<SimilarItem[] | null>(null);
   const key = id || JSON.stringify(draft);
+  const [pending, setPending] = useState("");
+  const endorse = async (x: SimilarItem) => {
+    if (!onEndorse || pending) return;
+    const on = !x.endorsedByMe;
+    setPending(x.id);
+    const ok = await onEndorse(x.id, on);
+    setPending("");
+    if (ok)
+      setItems((list) =>
+        (list || []).map((i) =>
+          i.id === x.id
+            ? { ...i, endorsedByMe: on, endorseCount: Math.max(0, (i.endorseCount || 0) + (on ? 1 : -1)) }
+            : i,
+        ),
+      );
+  };
   useEffect(() => {
     let alive = true;
     setItems(null);
@@ -64,7 +86,8 @@ export default function SimilarPanel({ id, draft, onOpen, onDuplicate, compact }
       </h4>
       {compact && (
         <p className="muted">
-          Aynı konu daha önce önerilmiş olabilir. Yine de gönderebilirsin; değerlendirici karar verir.
+          Aynı konu daha önce önerilmiş olabilir. Aynı fikirse onu destekleyebilirsin; farklıysa yine de gönder,
+          değerlendirici karar verir.
         </p>
       )}
       <ul>
@@ -82,6 +105,20 @@ export default function SimilarPanel({ id, draft, onOpen, onDuplicate, compact }
                 </small>
               )}
             </div>
+            {onEndorse && x.canEndorse && (
+              <div className="similar-actions">
+                <button
+                  type="button"
+                  className={"text-button endorse-button" + (x.endorsedByMe ? " on" : "")}
+                  aria-pressed={!!x.endorsedByMe}
+                  disabled={pending === x.id}
+                  onClick={() => endorse(x)}
+                >
+                  <ThumbsUp size={14} aria-hidden="true" /> {x.endorsedByMe ? "Destekledin" : "Destekle"}
+                  {(x.endorseCount || 0) > 0 && <small>{x.endorseCount}</small>}
+                </button>
+              </div>
+            )}
             {!compact && (
               <div className="similar-actions">
                 {x.canOpen && onOpen && (

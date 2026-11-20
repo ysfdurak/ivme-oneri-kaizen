@@ -16,6 +16,7 @@ import {
   canSee,
   overdueDays,
   redactProposal,
+  endorseView,
   supportWaits,
 } from "./model";
 import { findSimilarSafe } from "./similarity";
@@ -137,7 +138,9 @@ export async function runTool(
   const ctx = { users, matrix: state.matrix, org: state.settings?.org };
   const visible = state.proposals
     .filter((p) => canSee(p, viewer as any, ctx))
-    .map((p) => redactProposal(p, viewer.id, users.find((x) => x.id === p.author)?.name));
+    .map((p) =>
+      endorseView(redactProposal(p, viewer.id, users.find((x) => x.id === p.author)?.name), viewer.id),
+    );
   const name_ = (id?: string) =>
     id === ANON
       ? "Anonim çalışan"
@@ -147,6 +150,7 @@ export async function runTool(
   const brief = (p: Proposal) => ({
     id: p.id,
     baslik: p.title,
+    destek: p.endorseCount || 0,
     bolum: p.operation,
     durum: p.status,
     asamada_gun: age(p.stageAt),
