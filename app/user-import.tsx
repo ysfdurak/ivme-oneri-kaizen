@@ -4,6 +4,7 @@ import { getLocale, untranslate } from "../lib/i18n";
 // Akış: dosyayı oku → sütunları eşleştir → sunucuda deneme (dryRun) → onayla → yeni kişilerin geçici şifrelerini indir.
 import React, { useState } from "react";
 import { Download, FileSpreadsheet, Upload, X } from "lucide-react";
+import { csvSafe } from "../lib/csv-cell";
 
 type Row = {
   name: string;
@@ -95,8 +96,10 @@ export function download(name: string, text: string, type = "text/csv;charset=ut
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
-export const csvCell = (v: string) =>
-  /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+export const csvCell = (raw: string) => {
+  const v = csvSafe(raw);
+  return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+};
 
 export default function UserImport({
   onClose,
