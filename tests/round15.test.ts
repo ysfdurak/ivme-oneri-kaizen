@@ -62,3 +62,28 @@ assert.equal(canEndorse(p, "puan"), false);
 assert.throws(() => call({ action: "endorse", id, on: true }, by("puan")), /Kapalı kayıtta/);
 
 console.log("round15 passed");
+
+// --- Anonim ölçüm istemcisi (lib/olcum.ts): adres yoksa hiçbir istek gitmez; yalnız https adres kabul edilir ---
+import("../lib/olcum").then(async (o) => {
+  const cagri: string[] = [];
+  (globalThis as any).fetch = (u: string) => (cagri.push(u), Promise.resolve({ ok: true }));
+  const nav = (v: any) => Object.defineProperty(globalThis, "navigator", { value: v, configurable: true, writable: true });
+  nav({});
+  (globalThis as any).window = {};
+  o.olcumAyarla(undefined);
+  o.olc("gorunum", "/x");
+  assert.equal(await o.geriBildirim(5, "iyi"), false);
+  o.olcumAyarla("javascript:alert(1)");
+  assert.equal(o.olcumAcik(), false);
+  o.olcumAyarla("http://olcum.ysfdurak.com");
+  assert.equal(o.olcumAcik(), false, "https dışı reddedilir");
+  assert.equal(cagri.length, 0, "adres yokken istek gitmez");
+  o.olcumAyarla("https://olcum.ysfdurak.com");
+  nav({ globalPrivacyControl: true });
+  o.olc("gorunum");
+  assert.equal(cagri.length, 0, "GPC açıkken istek gitmez");
+  nav({});
+  o.olc("gorunum", "/reports");
+  assert.deepEqual(cagri, ["https://olcum.ysfdurak.com/e"]);
+  console.log("round15 olcum passed");
+});

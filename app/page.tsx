@@ -1,6 +1,7 @@
 "use client";
 import { Field } from "./field";
 import ReportsPage from "./reports-page";
+import { geriBildirim, olc, olcumAcik, olcumAyarla } from "../lib/olcum";
 import { intlLocale, translate } from "../lib/i18n";
 import React, { useEffect, useState } from "react";
 import {
@@ -595,6 +596,7 @@ export default function App() {
         setShowcase(Array.isArray(b.showcase) ? b.showcase : null);
         setEdition(b.edition === "ai" ? "ai" : "surec");
         setAltDemo(b.altDemo && typeof b.altDemo.url === "string" ? b.altDemo : null);
+        olcumAyarla(b.olcum);
         if (!b.demo) setLogin((l) => ({ ...l, username: "" }));
         if (b.error) setError(b.error);
       })
@@ -717,6 +719,7 @@ export default function App() {
         }),
         b: any = await r.json();
       if (!r.ok) throw Error(b.error);
+      if (action.startsWith("showcase:")) olc("demo_giris", "/" + (b.user?.role || ""));
       setUser(b.user || null);
       setState(null);
       if (action === "logout") {
@@ -764,6 +767,7 @@ export default function App() {
   }
   /** Benzer öneri listesinden fikre destek: başarılıysa panel kendi satırını günceller. */
   async function endorseSimilar(id: string, on: boolean) {
+    if (on) olc("destek", "/benzer");
     const b = await command(
       { action: "endorse", id, on },
       false,
@@ -778,6 +782,7 @@ export default function App() {
   }
   function navigate(p: string) {
     window.scrollTo({ top: 0, behavior: "instant" });
+    olc("gorunum", "/" + p);
     if (p === "new") setFormStep(1);
     setPage(p);
     setMobile(false);
@@ -1506,7 +1511,11 @@ export default function App() {
                   </button>
                 </div>
                 {showcase && (
-                  <DemoGuide role={user.role} onNavigate={navigate} />
+                  <DemoGuide
+                    role={user.role}
+                    onNavigate={navigate}
+                    feedback={olcumAcik() ? (r, t) => geriBildirim(r, t, "/" + user.role) : undefined}
+                  />
                 )}
                 {admin && strandedUsers.length > 0 && (
                   <button
@@ -2479,6 +2488,7 @@ export default function App() {
                           " kişisine iletildi.",
                       );
                       if (result) {
+                        olc("oneri_gonderildi");
                         clearDraft();
                         setForm(initialForm);
                         setFormStep(1);
@@ -3716,15 +3726,16 @@ export default function App() {
                           }
                           aria-pressed={!!p.endorsedByMe}
                           disabled={busy}
-                          onClick={() =>
+                          onClick={() => {
+                            if (!p.endorsedByMe) olc("destek", "/detay");
                             command(
                               { action: "endorse", id: p.id, on: !p.endorsedByMe },
                               false,
                               p.endorsedByMe
                                 ? "Desteğin geri alındı."
                                 : "Bu fikri desteklediğin kaydedildi.",
-                            )
-                          }
+                            );
+                          }}
                         >
                           {p.endorsedByMe ? "Desteği geri al" : "Bu fikri destekliyorum"}
                         </button>

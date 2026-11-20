@@ -34,9 +34,15 @@ const GUVENLIK_BASLIKLARI: Record<string, string> = {
   "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
   "Cross-Origin-Opener-Policy": "same-origin",
 };
-function guvenlikBasliklari(response: Response): Response {
+function guvenlikBasliklari(response: Response, env?: any): Response {
   const out = new Response(response.body, response);
   for (const [k, v] of Object.entries(GUVENLIK_BASLIKLARI)) if (!out.headers.has(k)) out.headers.set(k, v);
+  // Yalnız canlı vitrinde anonim ölçüm servisine bağlantı izni (lib/olcum.ts). Şirket kurulumu: yalnız 'self'.
+  const olcum = String(env?.IVME_OLCUM_URL ?? "https://olcum.ysfdurak.com");
+  if (String(env?.IVME_VITRIN ?? "0") === "1" && /^https:\/\/[a-z0-9.-]+$/i.test(olcum)) {
+    const csp = out.headers.get("Content-Security-Policy");
+    if (csp && !csp.includes(olcum)) out.headers.set("Content-Security-Policy", csp.replace("connect-src 'self'", "connect-src 'self' " + olcum));
+  }
   return out;
 }
 
@@ -46,7 +52,7 @@ const worker = {
     env: Cloudflare.Env,
     ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>,
   ) {
-    return guvenlikBasliklari(await uygulama(request, env, ctx));
+    return guvenlikBasliklari(await uygulama(request, env, ctx), env);
   },
   // Zamanlanmış görev (wrangler.jsonc → triggers.crons): vitrin demosunda her gece veriyi sıfırlar.
   async scheduled(

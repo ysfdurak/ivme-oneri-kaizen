@@ -2186,5 +2186,11 @@
  "Aynı konu daha önce önerilmiş olabilir. Aynı fikirse onu destekleyebilirsin; farklıysa yine de gönder, değerlendirici karar verir.": "This topic may have been suggested before. If it is the same idea, you can support it; if it is different, submit anyway and the evaluator will decide.",
  "Destekledin": "Supported",
  "Destekle": "Support",
- "Kendi önerini destekleyemezsin.": "You cannot support your own suggestion."
+ "Kendi önerini destekleyemezsin.": "You cannot support your own suggestion.",
+ "Teşekkürler, geri bildirimin alındı.": "Thanks, your feedback was received.",
+ "Bu demo işine yaradı mı?": "Was this demo useful?",
+ "Kısa not (isteğe bağlı)": "Short note (optional)",
+ "Kısa not (isteğe bağlı, adını yazma)": "Short note (optional, don't write your name)",
+ "Gönderilemedi, sonra tekrar dene.": "Could not send, try again later.",
+ "Anonim: çerez, ad ya da IP tutulmaz.": "Anonymous: no cookies, names or IP addresses are stored."
 }
