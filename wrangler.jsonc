@@ -23,7 +23,10 @@
     // Vitrinde giriş ekranında öteki dildeki demoya bağlantı (boşsa gösterilmez).
     "IVME_ALT_DEMO_URL": "https://ivme-en.ysfdurak.com",
     // Vitrin demosunun kendi adresi: arama ve paylaşım etiketleri (canonical, hreflang, Open Graph) için. Şirket kurulumunda boş bırakılır.
-    "IVME_PUBLIC_URL": "https://ivme.ysfdurak.com"
+    "IVME_PUBLIC_URL": "https://ivme.ysfdurak.com",
+    // Vitrin demosunda kullanım ölçümü ve geri bildirim (ortak servis). Şirket kurulumunda boş bırakılır; boşsa hiçbir şey yüklenmez.
+    "OLCUM_URL": "https://olcum.ysfdurak.com",
+    "OLCUM_PROJE": "ivme"
   },
   // Her gece 00:00 UTC (03:00 TR): vitrin verisini sıfırla (worker/index.ts → scheduled).
   "triggers": { "crons": ["0 0 * * *"] },
@@ -40,7 +43,9 @@
         "EMAIL_PROVIDER": "log",
         "IVME_LANG": "en",
         "IVME_ALT_DEMO_URL": "https://ivme.ysfdurak.com",
-        "IVME_PUBLIC_URL": "https://ivme-en.ysfdurak.com"
+        "IVME_PUBLIC_URL": "https://ivme-en.ysfdurak.com",
+        "OLCUM_URL": "https://olcum.ysfdurak.com",
+        "OLCUM_PROJE": "ivme-en"
       },
       "triggers": { "crons": ["0 0 * * *"] }
     }

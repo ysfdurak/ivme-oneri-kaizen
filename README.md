@@ -82,8 +82,10 @@ Büyük test verisi üretmek için `scripts/test-verisi/README.md` dosyasına ba
 
 `wrangler.jsonc` Cloudflare Workers ayarlarını içerir. Depo Cloudflare Workers Builds'e bağlıdır; `main` dalına her gönderimde derlenir ve yayınlanır. İngilizce demo aynı depodan ayrı bir Worker (`ivme-en`) olarak derlenir: `CLOUDFLARE_ENV=en npm run build` (kurulum adımları: [docs/DIL_DESTEGI.md](docs/DIL_DESTEGI.md)). Cloudflare panelinde en sağlam yol, `ivme-en` Worker'ının **Settings → Build → Variables and secrets** bölümüne `CLOUDFLARE_ENV = en` derleme değişkenini eklemek ve derleme komutunu `npm run build` bırakmaktır. Derleme günlüğünde `ivme-en-db` ve `IVME_LANG: "en"` görünmüyorsa Worker Türkçe ayarla yayınlanmıştır. D1 veritabanı ilk yayında otomatik oluşturulur, tablolar uygulamanın ilk açılışında kurulur.
 
+**Canlı demoda kullanım ölçümü ve geri bildirim:** Vitrinde (`IVME_VITRIN=1`) ve `OLCUM_URL` / `OLCUM_PROJE` doluysa ortak ölçüm servisi (olcum.ysfdurak.com) yüklenir. Ekran adları, aktif süre ve işlem adları (`islem:create` gibi) ölçülür; öneri metni, kişi ve bölüm adları gönderilmez. Menüdeki **Geri bildirim ver** düğmesi puan ve yorum toplar. Kod: `app/olcum.ts`; servis ve gizlilik kararları: [ysfdurak.com → sunucu/olcum](https://github.com/ysfdurak/ysfdurak.com/tree/main/sunucu/olcum).
+
 **Şirket kurulumu için:**
-- `IVME_VITRIN` ve `IVME_DEMO` `0` yapılır.
+- `IVME_VITRIN` ve `IVME_DEMO` `0` yapılır. Ölçüm ayarı bu durumda hiç gönderilmez; istenirse `OLCUM_URL` ve `OLCUM_PROJE` satırları da silinir.
 - İlk yönetici şifresi gizli değer olarak verilir: `npx wrangler secret put IVME_ILK_SIFRE` (en az 12 karakter). Tanımlı değilse uygulama açılmaz ve bunu ekranda söyler. `admin` kullanıcısı bu şifreyle girer ve ilk girişte kendi şifresini belirler. Örnek kişiler girişe kapalı oluşur; gerekirse yönetici Kullanıcılar ekranından şifre sıfırlar. (Herkesçe bilinen `Kaizen123!` yalnız demo kurulumlarında kullanılır.)
 - E-posta için `EMAIL_PROVIDER` ve ilgili gizli anahtarlar eklenir.
 - Kurumun e-posta ve kimlik altyapısı bağlanır.
