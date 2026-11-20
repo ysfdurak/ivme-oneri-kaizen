@@ -26,6 +26,7 @@ export default function CampaignSettings({
 }) {
   const saved = state.settings?.campaigns || [];
   const [list, setList] = useState<Campaign[]>(saved);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- sunucudaki kayıt içerik olarak değişince yansıt (dizi kimliği her çizimde yeni)
   useEffect(() => setList(saved), [JSON.stringify(saved)]);
   const dirty = JSON.stringify(list) !== JSON.stringify(saved);
   const set = (i: number, patch: Partial<Campaign>) =>

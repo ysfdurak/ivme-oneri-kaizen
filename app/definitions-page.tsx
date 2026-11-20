@@ -173,12 +173,14 @@ export default function DefinitionsPage({
   const [synDirty, setSynDirty] = useState(false);
   useEffect(() => {
     if (!synDirty) setSynonyms(toText(state.settings?.synonyms));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnız sunucudaki ayar değişince ve yerelde düzenleme yokken yansıt
   }, [state.settings?.synonyms]);
   const [dirty, setDirty] = useState({ org: false, loc: false });
   // Başka bir yöneticinin kaydettiği değişiklikler, yerelde düzenleme yoksa ekrana yansır.
   useEffect(() => {
     if (!dirty.org) setOrg(state.settings?.org || emptyOrg);
     if (!dirty.loc) setLocations(state.settings?.locations || []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnız sunucudaki ayar değişince ve yerelde düzenleme yokken yansıt
   }, [state.settings]);
   const edit = (next: OrgDefinitions) => {
     setOrg(next);

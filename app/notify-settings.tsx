@@ -43,6 +43,7 @@ export default function NotifySettings({ state, busy, who, command, alert }: Pro
       setDisabled(state.settings?.notify?.disabled || []);
       setDays(state.settings?.notify?.escalateAfterDays ?? 5);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnız sunucudaki ayar değişince ve yerelde düzenleme yokken yansıt
   }, [state.settings?.notify]);
   async function post(action: string) {
     setWorking(action);

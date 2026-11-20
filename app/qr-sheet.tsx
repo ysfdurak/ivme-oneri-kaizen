@@ -79,6 +79,7 @@ export default function QrSheet({
     return () => {
       live = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- listeler içerik olarak değişince yeniden üretilir
   }, [base, mode, bolum, lokasyon, operations.join("|"), locations.join("|")]);
 
   return (

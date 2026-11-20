@@ -35,7 +35,10 @@ export default function PersonPicker({
   const [active, setActive] = useState(0);
   const listId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
-  const selected = multiple ? (value as string[]) || [] : value ? [value as string] : [];
+  const selected = useMemo(
+    () => (multiple ? (value as string[]) || [] : value ? [value as string] : []),
+    [multiple, value],
+  );
   const byId = (id: string) => users.find((u) => u.id === id);
   const matches = useMemo(() => {
     const q = norm(query.trim());

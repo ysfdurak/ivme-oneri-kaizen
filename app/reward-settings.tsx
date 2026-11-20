@@ -24,6 +24,7 @@ export default function RewardSettings({
 }) {
   const saved = state.settings?.rewards || DEFAULT_REWARD_SETTINGS;
   const [rs, setRs] = useState<RS>(saved);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- sunucudaki kayıt içerik olarak değişince yansıt (dizi kimliği her çizimde yeni)
   useEffect(() => setRs(saved), [JSON.stringify(saved)]);
   const dirty = JSON.stringify(rs) !== JSON.stringify(saved);
   const set = (i: number, patch: Partial<RewardRule>) =>

@@ -45,6 +45,7 @@ export default function SimilarPanel({ id, draft, onOpen, onDuplicate, compact }
     return () => {
       alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- anahtar (kimlik ya da taslak içeriği) değişince istek atılır
   }, [key]);
 
   if (items === null) return <p className="muted similar-loading">Benzer öneriler aranıyor…</p>;

@@ -154,6 +154,7 @@ function ListSettings({
   const saved = listOf(state, k);
   const [items, setItems] = useState<ListItem[]>(saved);
   const [open, setOpen] = useState<string | null>(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- sunucudaki kayıt içerik olarak değişince yansıt (dizi kimliği her çizimde yeni)
   useEffect(() => setItems(saved), [JSON.stringify(saved)]);
   const dirty = !same(items, saved);
   const ps = state.proposals as Proposal[];
@@ -290,6 +291,7 @@ function ScoringSettings({
 }) {
   const saved = scoringOf(state);
   const [sc, setSc] = useState<Scoring>(saved);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- sunucudaki kayıt içerik olarak değişince yansıt (dizi kimliği her çizimde yeni)
   useEffect(() => setSc(saved), [JSON.stringify(saved)]);
   const dirty = !same(sc, saved);
   const set = (i: number, patch: any) =>
@@ -458,6 +460,7 @@ function TargetDaysSettings({
             DEFAULT_TARGET_DAYS[st],
         ]),
       ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnız hedef günler içerik olarak değişince
     [JSON.stringify((state.settings as any)?.targetDays)],
   );
   const [days, setDays] = useState<Record<string, number>>(saved);
