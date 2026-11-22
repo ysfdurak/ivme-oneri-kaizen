@@ -1418,16 +1418,19 @@ export default function App() {
               <b>{user.name}</b>
               <small>{ROLES[user.role]}</small>
             </div>
-            <button
-              aria-label="Bildirim tercihim"
-              title="Bildirim tercihim"
-              className="icon-button"
-              onClick={() =>
-                open("prefs", { notify: user.notify || "instant" })
-              }
-            >
-              <Bell size={17} />
-            </button>
+            {/* Vitrinde bildirim tercihi sunucuda kapalı (myPrefs reddedilir) ve e-posta gönderilmez; düğme gösterilmez. */}
+            {!showcase && (
+              <button
+                aria-label="Bildirim tercihim"
+                title="Bildirim tercihim"
+                className="icon-button"
+                onClick={() =>
+                  open("prefs", { notify: user.notify || "instant" })
+                }
+              >
+                <Bell size={17} />
+              </button>
+            )}
             <button
               aria-label="Çıkış yap"
               title="Çıkış yap"

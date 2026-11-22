@@ -20,4 +20,9 @@ assert.ok(JSON.stringify(state).length < 600_000, "vitrin verisi ücretsiz plan 
 for (const u of ["calisan", "on.lojistik", "op.lojistik", "mudur.lojistik", "ik", "admin"])
   assert.ok(users.some((x: any) => x.username === u && x.active), u + " vitrinde olmalı");
 assert.ok(!JSON.stringify(users).includes("Yusuf"), "vitrinde gerçek kişi adı yok");
+// Sunucu vitrinde myPrefs'i reddeder; arayüz bildirim tercihi düğmesini vitrinde göstermemeli.
+const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+const prefsButton = page.indexOf('aria-label="Bildirim tercihim"');
+assert.ok(prefsButton > 0);
+assert.ok(page.lastIndexOf("{!showcase && (", prefsButton) > page.lastIndexOf("</div>", prefsButton), "bildirim tercihi düğmesi vitrinde gizli olmalı");
 console.log("Vitrin tests passed: date rebasing, demo data size and roles.");
