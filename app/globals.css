@@ -759,6 +759,8 @@ small {
   font-size: 13px;
 }
 .table-scroll {
+  /* Mutlak konumlu iç öğeler (ör. .sr-only) kaydırma alanında kalsın; yoksa sayfa yatay taşar. */
+  position: relative;
   overflow-x: auto;
   width: 100%;
 }
