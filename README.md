@@ -73,7 +73,7 @@ pnpm install
 npm run build
 npm start                                   # http://localhost:8787
 npm start -- --var IVME_VITRIN:0            # vitrin yerine normal giriş ekranı
-./scripts/test.sh                           # 22 test grubu
+./scripts/test.sh                           # 27 test grubu
 ```
 
 Büyük test verisi üretmek için `scripts/test-verisi/README.md` dosyasına bakın.
@@ -94,6 +94,7 @@ Bu sürüm bütün çalışma alanını tek bir kayıtta tuttuğu için D1'in 2 
 
 ## Belgeler
 
+- [docs/PROJE_REHBERI.md](docs/PROJE_REHBERI.md): projenin tamamı tek belgede (mimari, kod turu, yayın, testler, mülakat, kendini test et)
 - [docs/IYILESTIRME_NOTLARI.md](docs/IYILESTIRME_NOTLARI.md): her özelliğin neden ve nasıl eklendiği, tur tur
 - [docs/AKTARIM_REHBERI.md](docs/AKTARIM_REHBERI.md): eski önerilerin Excel ile aktarılması ve geri alınması
 - [docs/MCP_REHBERI.md](docs/MCP_REHBERI.md): yapay zekâ katmanı, kurulum ve güvenlik
