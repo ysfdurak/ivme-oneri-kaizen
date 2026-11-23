@@ -366,7 +366,7 @@ Uygulama kullanıldıkça günde bir kez, 07:00'den (TR) sonraki ilk istekte ken
 - Kapanışta fotoğraf zorunlu değildir; "sonra" fotoğrafı isteğe bağlıdır (testle doğrulandı).
 
 ## Otomatik ödül
-- **Kurallar** (Tanımlar > Ödül kuralları): en az puan + isteğe bağlı en az ilk yıl net kazanç → ödül türü (maaş katı / tutar / hediye-belge), değer ve ad. Yüksek eşik önce denenir; uyan ilk kural uygulanır. Birlikte önerenlerde değer eşit bölünür ya da herkes tamamını alır.
+- **Kurallar** (Tanımlar > Ödül kuralları): en az puan + isteğe bağlı en az ilk yıl net kazanç → ödül türü (maaş katı / tutar / hediye-belge), değer ve ad. Yüksek eşik önce denenir; uyan ilk kural uygulanır. Birlikte önerenlerde değer eşit bölünür ya da herkes tamamını alır. Eşit bölme tam kuruş üzerinden yapılır ve payların toplamı onaylanan tutara eşittir; artan kuruşlar sırayla öneri sahibinden başlayarak eklenir (100 ₺ / 3 → 33,34 + 33,33 + 33,33). Önceden her pay ayrı yuvarlandığı için 100 ₺ 99,99 ₺, 5.000 ₺ 5.000,01 ₺ ediyordu (denetim D15, 23 Kasım 2026; `lib/rewards.ts` → `shares`).
 - Örnek kurallar: 85+ puan ve 100.000 ₺+ net → 0,5 brüt maaş · 70+ → 5.000 ₺ · 50+ → 1.500 ₺ hediye çeki · altı → teşekkür belgesi.
 - **Akış:** puanlama kaydedilince öneri "Tamamlandı" olur ve ödül kaydı otomatik oluşur → "Ödül sorumlusu (İK)" rolüne e-posta → İK **Ödüller** sayfasında onaylar (değeri gerekçeyle değiştirebilir) ya da reddeder (gerekçe zorunlu) → bordro döneminde "Ödendi" işaretler. Onay ve ödeme öneren ile birlikte önerenlere bildirilir.
 - **Bordro listesi:** onaylanan ve ödenen ödüller kişi başı satırla Excel'e alınır (ad, kullanıcı adı, departman, ödül, dönem).

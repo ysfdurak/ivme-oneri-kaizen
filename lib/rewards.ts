@@ -171,18 +171,27 @@ export function pickRule(
   return { rule, score, net };
 }
 
-/** Kişi başı pay: eşit bölmede iki ondalığa yuvarlanır, hediyede herkes aynı hediyeyi alır. */
+/**
+ * Kişi başı pay. Eşit bölmede tutar tam kuruş (maaş katında yüzde bir) üzerinden dağıtılır ve
+ * payların toplamı onaylanan tutara eşittir: artan kuruşlar listedeki sırayla (önce öneri sahibi)
+ * birer birer eklenir. Ör. 100 TL / 3 → 33,34 + 33,33 + 33,33. Hediyede ve "kişi başı" kuralda herkes tutarın tamamını alır.
+ */
 export function shares(
   kind: RewardKind,
   total: number,
   people: string[],
   split: RewardSettings["split"],
 ) {
-  const each =
-    kind === "gift" || split === "each"
-      ? total
-      : Math.round((total / Math.max(1, people.length)) * 100) / 100;
-  return people.map((userId) => ({ userId, value: each }));
+  if (kind === "gift" || split === "each")
+    return people.map((userId) => ({ userId, value: total }));
+  const n = Math.max(1, people.length);
+  const cents = Math.round(total * 100);
+  const base = Math.trunc(cents / n);
+  const rest = cents - base * n; // 0 ≤ rest < n (eksi tutarda da işaretle uyumlu)
+  return people.map((userId, i) => ({
+    userId,
+    value: (base + (i < Math.abs(rest) ? Math.sign(rest) : 0)) / 100,
+  }));
 }
 
 /** Tamamlanan öneri için ödül kaydı üretir (kural yoksa null). */
