@@ -451,3 +451,18 @@ void anonId;
 console.log(
   "Round 8 passed: net gain, participation report, reward rules, automatic reward after scoring, HR decision/override/payment, rollback cancel, notifications without salary data.",
 );
+
+// Denetim D15: eşit bölmede paylar tam kuruş ve toplam onaylanan tutara eşit.
+{
+  const sum = (xs: { value: number }[]) => Math.round(xs.reduce((a, x) => a + x.value * 100, 0));
+  for (const [total, n] of [[100, 3], [5000, 3], [0.01, 2], [1, 7], [2500.5, 4], [1, 3]] as const) {
+    const people = Array.from({ length: n }, (_, i) => "k" + i);
+    const r = shares(total === 1 && n === 3 ? "salary" : "amount", total, people, "equal");
+    assert.equal(sum(r), Math.round(total * 100), `${total}/${n}`);
+    for (const x of r) assert.ok(Number.isInteger(Math.round(x.value * 100 * 1e6) / 1e6), "tam kuruş");
+    const vals = r.map((x) => x.value);
+    assert.ok(Math.max(...vals) - Math.min(...vals) <= 0.0100001, "fark en çok 1 kuruş");
+  }
+  assert.deepEqual(shares("amount", 100, ["a", "b", "c"], "equal").map((x) => x.value), [33.34, 33.33, 33.33]);
+  assert.deepEqual(shares("amount", 5000, ["a", "b", "c"], "equal").map((x) => x.value), [1666.67, 1666.67, 1666.66]);
+}
