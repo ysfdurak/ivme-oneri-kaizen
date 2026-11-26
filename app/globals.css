@@ -8904,3 +8904,10 @@ b.overdue {
     display: inline-flex;
   }
 }
+
+/* Uyarı bildirimi (ör. açılamayan öneri bağlantısı): başarı bildiriminden ayrı renk ve simge */
+.toast.warn {
+  background: #6b3d0a;
+  border-color: #9a6a2b;
+  color: #fff7ea;
+}

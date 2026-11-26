@@ -148,18 +148,19 @@ export async function POST(req: Request) {
       (await password(String(b.password || ""), u.password.split(":")[0])) !==
       u.password
     ) {
+      // Süresi dolmuş bir kilitten sonra sayaç sıfırdan başlar; yoksa tek yanlış deneme yeniden 5 dk kilitlerdi.
+      const failures = (u.locked_until && u.locked_until <= Date.now() ? 0 : u.failures) + 1;
       await db()
-        .prepare(
-          "UPDATE users SET failures=failures+1,locked_until=? WHERE id=?",
-        )
-        .bind(u.failures >= 4 ? Date.now() + 300000 : 0, u.id)
+        .prepare("UPDATE users SET failures=?,locked_until=? WHERE id=?")
+        .bind(failures, failures >= 5 ? Date.now() + 300000 : 0, u.id)
         .run();
       return json({ error: LOGIN_FAILED }, 401);
     }
-    await db()
-      .prepare("UPDATE users SET failures=0,locked_until=0 WHERE id=?")
-      .bind(u.id)
-      .run();
+    await db().batch([
+      db().prepare("UPDATE users SET failures=0,locked_until=0 WHERE id=?").bind(u.id),
+      // Süresi dolmuş oturum satırları birikmesin (şirket kurulumunda gece sıfırlaması yok).
+      db().prepare("DELETE FROM sessions WHERE expires<?").bind(Date.now()),
+    ]);
     const token = crypto.randomUUID() + crypto.randomUUID();
     await db()
       .prepare("INSERT INTO sessions (token,user_id,expires) VALUES (?,?,?)")

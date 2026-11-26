@@ -569,10 +569,17 @@ export default function App() {
   // Aktarılanlar süzgecinde yönetici kapalı kayıtları da seçebilir (silmek için).
   const selectableOf = (p: Proposal) =>
     !CLOSED.includes(p.status) || (admin && statusFilter === "__imported");
-  const alert = (m: string) => {
+  const [toastWarn, setToastWarn] = useState(false);
+  const alert = (m: string, warn = false) => {
     setToast(m);
+    setToastWarn(warn);
     setTimeout(() => setToast(""), 7000);
   };
+  // Penceredeki hata uzun formun altında kalıp görünmüyordu (26 Kasım 2026 örneklemi): hata çıkınca oraya kaydır.
+  React.useEffect(() => {
+    if (modal && error)
+      document.querySelector(".modal .modal-body > .error")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [modal, error]);
   // Elimizdeki sürüm sunucuya gönderilir; değişiklik yoksa kayıtlar yeniden indirilmez.
   const versionRef = React.useRef(0);
   async function refresh(force = false) {
@@ -659,7 +666,7 @@ export default function App() {
     if (link.oneri) {
       const p = state.proposals.find((x) => x.id === link.oneri);
       if (p) openWork(p);
-      else alert(link.oneri + " bulunamadı ya da bu öneriyi görme yetkin yok.");
+      else alert(link.oneri + " bulunamadı ya da bu öneriyi görme yetkin yok.", true);
     } else if (link.yeni) {
       const operation = state.operations.includes(link.bolum) ? link.bolum : "";
       const loc = (state.settings?.locations || []).includes(link.lokasyon)
@@ -6030,7 +6037,7 @@ export default function App() {
                     </div>
                   </>
                 )}
-                {error && <div className="error">{error}</div>}
+                {error && <div className="error" role="alert">{error}</div>}
               </div>
               <footer className="modal-footer">
                 <button
@@ -6093,8 +6100,8 @@ export default function App() {
         </div>
       )}
       {toast && (
-        <div role="status" className="toast">
-          <CheckCircle2 size={19} />
+        <div role="status" className={"toast" + (toastWarn ? " warn" : "")}>
+          {toastWarn ? <AlertCircle size={19} /> : <CheckCircle2 size={19} />}
           {toast}
         </div>
       )}
