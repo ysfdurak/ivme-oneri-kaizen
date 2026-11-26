@@ -17,6 +17,7 @@ import {
   NOT_IMPLEMENTED_REASONS,
   CURRENCIES,
   ANON_LABEL,
+  scrubName,
 } from "./model";
 import { REPORT_IDS, REPORTS } from "./dashboard";
 import {
@@ -45,7 +46,11 @@ const NOTIFY_KEYS: string[] = NOTIFY_RULES.map((r) => r.key);
 export function applyCommand(s: State, b: any, u: User, us: User[]) {
   const now = new Date().toISOString();
   const assert = (v: any, m: string) => {
-    if (!v) throw new Error(m);
+    if (!v) {
+      const e: any = new Error(m);
+      if (/yetki/i.test(m)) e.status = 403; // "Yetkiniz yok.", "Devir yetkiniz yok." …
+      throw e;
+    }
   };
   const validUser = (id: string) =>
     us.some((x) => x.id === id && x.active !== 0);
@@ -59,7 +64,7 @@ export function applyCommand(s: State, b: any, u: User, us: User[]) {
   // Anonim öneride geçmiş metnine önerenin adı yazılmaz (devir, yönlendirme gibi ad içeren kayıtlar).
   const anonText = (p: Proposal, text: string) => {
     const n = p.anonymous ? us.find((x) => x.id === p.author)?.name : "";
-    return n ? text.split(n).join(ANON_LABEL) : text;
+    return scrubName(text, n);
   };
   const log = (p: Proposal, text: string) => {
     p.history.unshift({ at: now, actor: u.id, text: anonText(p, text) });

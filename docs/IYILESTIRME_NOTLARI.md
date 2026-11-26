@@ -535,3 +535,18 @@ Tanımlar → **Eski önerileri aktar** (yalnız sistem yöneticisi). Ayrıntıl
 - **Gizlilik:** Kayıtta destekleyenlerin kimliği (`endorsements`) tutulur ama **kimseye gitmez**; `endorseView` dışarı giden kopyada listeyi siler, yalnızca `endorseCount` ve `endorsedByMe` bırakır (`/api/state`, `/api/similar`, MCP). Destek gizli oy gibidir: öneren, yönetici ve sistem yöneticisi kimin desteklediğini görmez. Böylece "amirimin fikrini desteklemezsem ne olur" baskısı oluşmaz.
 - **Test:** `tests/round15.test.ts`: kendi/ortak öneriye destek reddi, görmeden destek, çift sayılmama, geri alma, geçmişe yazılmama, dışarı giden kopyada kimlik olmaması, kapalı öneride ret.
 - **Kod bölme:** Raporlar sayfası `app/page.tsx`'ten `app/reports-page.tsx`'e, ortak `Field` bileşeni `app/field.tsx`'e taşındı (page.tsx ~6.900 → ~6.400 satır). 22 `react-hooks/exhaustive-deps` uyarısının hepsi incelendi: bilinçli eşitleme kalıpları (taslak geri yükleme, modal odağı, bağlantı işleme vb.) satır üstünde gerekçesiyle işaretlendi; gerçek sorun olan `person-picker`'daki her çizimde yeni dizi üretimi `useMemo` ile düzeltildi.
+
+## Örneklem bulguları (26 Kasım 2026)
+
+Rol senaryoları yerel sunucuda gerçek API isteğiyle denenirken bulunanlar ve proje dokümanında (Sekme 8-12) kayıtlı hatalar:
+
+- **Penceredeki hata görünmüyordu:** uzun pencerelerde (ör. Kullanıcı ekle) hata formun altında kalıyordu. Hata çıkınca görünür alana kaydırılır ve `role="alert"` ile ekran okuyucuya okunur (`app/page.tsx`).
+- **Uyarı bildirimi başarı simgesiyle çıkıyordu:** `alert(mesaj, true)` turuncu zemin ve uyarı simgesi kullanır; açılamayan öneri bağlantısı bunu kullanır.
+- **Yetki hatası 403:** `applyCommand` içindeki `assert`, "yetki" içeren mesajları işaretler; `/api/command` bunlara 400 yerine 403 döner. Kural ve biçim hataları 400 kalır.
+- **Yeni öneri gereksiz 409 alıyordu:** `create` var olan bir kaydı değiştirmediği için sürüm farkında eski sayılmaz.
+- **Anonim ad başka adları bozuyordu:** "Ali Kaya" gizlenirken "Ali Kayalı" da değişiyordu. `scrubName` (`lib/model.ts`) yalnız tam adı değiştirir; yazarken (`applyCommand › anonText`) ve okurken (`redactProposal`) aynı fonksiyon kullanılır.
+- **Kilit sayacı:** süresi dolmuş kilitten sonra sayaç sıfırdan başlar; önceden tek yanlış deneme yeniden 5 dk kilitliyordu.
+- **Oturum tablosu:** başarılı girişte süresi dolmuş oturum satırları silinir (şirket kurulumunda gece sıfırlaması yok).
+- **Boyut sınırı bayt:** gövde karakter değil UTF-8 bayt olarak sayılır.
+- **Test:** `tests/round16.test.ts`; `server.integration.cjs` yetkisiz iptalde 403 ve eski sürümle yeni öneriyi sınar. 28 grup geçti. Tarayıcıda: uyarı bildirimi ve penceredeki hata görünür.
+- **Bilerek bırakılan:** `/api/state` okuma isteğinde günlük e-posta işi (`tick`) çalışıyor. Şirket kurulumunda zamanlayıcı tanımlı olmadığı için taşımak, kurulum belgesine cron eklemeyi gerektiriyor; ayrı iş.

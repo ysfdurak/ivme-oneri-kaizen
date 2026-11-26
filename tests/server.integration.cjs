@@ -30,7 +30,9 @@ const row=sqlite.prepare('SELECT password FROM users WHERE id=?').get('admin');a
 await req('auth',{action:'logout'});[r,b]=await req('auth',{username:'calisan',password:'Kaizen123!'});assert.equal(r.status,200);
 await req('auth',{action:'password',oldPassword:'Kaizen123!',password:crypto.randomUUID()});
 [r,b]=await req('state');assert.equal(r.status,200);assert.ok(b.state.proposals.every(p=>p.author==='calisan'||p.owner==='calisan'||p.actions.some(a=>a.owner==='calisan')||p.support.some(a=>a.owner==='calisan')||p.evaluator==='calisan'||p.history.some(h=>h.actor==='calisan')));
-[r,b]=await req('command',{action:'cancel',id,reason:'Yetkisiz deneme',version:b.version});assert.equal(r.status,400);
+[r,b]=await req('command',{action:'cancel',id,reason:'Yetkisiz deneme',version:b.version});assert.equal(r.status,403,'yetki hatası 403');
+// Yeni öneri, arada başka kayıtlar değişti diye 409 almaz (eski sürümle gönderilse de)
+{const ops=b.state?.operations;[r,b]=await req('state');const v=b.version;[r,b]=await req('command',{action:'create',title:'Eski sürümle öneri',problem:'Sorun metni.',solution:'Çözüm metni.',operation:b.state.operations[0],version:v-1});assert.equal(r.status,200,JSON.stringify(b));}
 const foreign=new Request(origin+'/api/auth',{method:'POST',headers:{Origin:'https://foreign.test','Content-Type':'application/json'},body:JSON.stringify({username:'admin',password:'x'})});assert.equal((await auth.POST(foreign)).status,403);
 console.log('Server integration passed: real SQLite persistence, login, forced password change, hashed passwords, cookie sessions, stale version rejection, logout, role access and cross-origin rejection.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>sqlite.close());

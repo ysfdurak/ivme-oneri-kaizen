@@ -23,7 +23,8 @@ export async function POST(req: Request) {
     if (!u) return json({ error: "Oturum açın." }, 401);
     if (u.must_change) return json({ error: "Şifrenizi değiştirin." }, 403);
     const raw = await req.text();
-    if (raw.length > 2300000)
+    // Karakter değil bayt: Türkçe harfler UTF-8'de 2 bayttır.
+    if (new TextEncoder().encode(raw).length > 2300000)
       return json({ error: "Dosya boyutu sınırı aşıldı." }, 400);
     const b = JSON.parse(raw);
     await ensureSchema();
@@ -202,7 +203,11 @@ export async function POST(req: Request) {
         const target = b.id
           ? s.proposals.find((p: any) => p.id === b.id)
           : null;
-        const stale = !b.id || !target || (target.rev || 0) > b.version;
+        // Yeni öneri var olan hiçbir kaydı değiştirmez; arada başka öneriler değişmiş olması onu eskitmez.
+        const stale =
+          b.action === "create"
+            ? false
+            : !b.id || !target || (target.rev || 0) > b.version;
         if (stale || typeof b.version !== "number") return json(conflict, 409);
       }
       const id = applyCommand(s, b, { ...u, mustChange: u.must_change }, us);
@@ -262,7 +267,8 @@ export async function POST(req: Request) {
       409,
     );
   } catch (e: any) {
-    return json({ error: e.message || "İşlem tamamlanamadı." }, 400);
+    // Yetki hatası 403, kural ya da biçim hatası 400 (lib/workflow.ts › assert işaretler).
+    return json({ error: e.message || "İşlem tamamlanamadı." }, e.status === 403 ? 403 : 400);
   }
 }
 
